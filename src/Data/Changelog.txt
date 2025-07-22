@@ -1,0 +1,17 @@
+# *Version 0.0.1*
+
+> Membuat Pondasi Bot
+> add Message queue
+> add File Manager
+> add Json Manager
+> add registry command
+
+# *Version 0.0.2*
+
+> Membuat command dasar ( /help, /menu )
+
+# *Version 0.0.3*
+
+> fix error untuk registry command dan mengarahkan ke yang benar :V
+> Tambah Command dan tambah database 
+

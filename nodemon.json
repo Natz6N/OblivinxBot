@@ -1,0 +1,19 @@
+{
+  "watch": ["src", "app.js", "index.js"],
+  "ext": "js,json,ts",
+  "ignore": [
+    "node_modules",
+    "dist",
+    "public",
+    "src/Data/JSON/*.json",         
+    "src/Data/Backups/**",          
+    "Data/JSON/*.json",            
+    "Data/Backups/**"
+  ],
+  "exec": "node ./index.js",
+  "restartable": "rs",
+  "env": {
+    "NODE_ENV": "development"
+  },
+  "verbose": true
+}

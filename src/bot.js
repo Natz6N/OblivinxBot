@@ -1,85 +1,143 @@
-import { makeWASocket, useMultiFileAuthState, DisconnectReason, isJidNewsletter } from "@whiskeysockets/baileys";
+// bot.js - Main bot initialization file
+import {
+  makeWASocket,
+  useMultiFileAuthState,
+  DisconnectReason,
+  isJidNewsletter,
+} from "@whiskeysockets/baileys";
 import Pino from "pino";
 import qrcode from "qrcode-terminal";
 import * as Boom from "@hapi/boom";
+import { MessageRegistry } from "./Clients/RegistryCommands.js";
+import {
+  createMessageHandler,
+  processMessageFromQueue,
+} from "./Clients/messageClients.js";
 
+import { setupAntiCall } from "./Clients/Settings/antiCall.js";
+import config from "./config.js"; 
 const groupCache = new Map();
-const doReplies = true;
+let pairingCodeRequested = false;
 
-async function sendMessageWTyping(message, jid, sock) {
-  await sock.presenceSubscribe(jid);
-  await delay(500);
-  await sock.sendPresenceUpdate("composing", jid);
-  await delay(1000);
-  await sock.sendPresenceUpdate("paused", jid);
-  await sock.sendMessage(jid, message);
-}
+// Create logger
+export const botLogger = Pino({
+  level: "info",
+  transport: {
+    target: "pino-pretty",
+    options: {
+      colorize: true,
+    },
+  },
+});
 
-const delay = (ms) => new Promise((res) => setTimeout(res, ms));
 
-export default async function initBot() {
-  const { state, saveCreds } = await useMultiFileAuthState("auth_info_baileys");
+export default async function initBot(queue) {
+  try {
+    const { state, saveCreds } = await useMultiFileAuthState("__oblivinx_auth");
 
-  const sock = makeWASocket({
-    auth: state,
-    printQRInTerminal: true,
-    logger: Pino({ level: "silent" }),
-    browser: ["Oblivinx Bot", "Chrome", "1.0.0"],
-    cachedGroupMetadata: async (jid) => groupCache.get(jid),
-  });
+    const sock = makeWASocket({
+      auth: state,
+      printQRInTerminal: true,
+      logger: Pino({ level: "silent" }),
+      browser: ["Oblivinx Bot", "Chrome", "1.0.0"],
+      cachedGroupMetadata: async (jid) => groupCache.get(jid),
+    });
 
-  sock.ev.on("creds.update", saveCreds);
+    // Initialize command registry with sock parameter
 
-  sock.ev.on("groups.update", async ([event]) => {
-    const metadata = await sock.groupMetadata(event.id);
-    groupCache.set(event.id, metadata);
-  });
+    const registry = new MessageRegistry(sock, botLogger);
+    registry.setPrefix("/").setOwners(["6281910058235"]); // Replace with your phone number
+    queue.setDefaultHandler(processMessageFromQueue);
 
-  sock.ev.on("group-participants.update", async (event) => {
-    const metadata = await sock.groupMetadata(event.id);
-    groupCache.set(event.id, metadata);
-  });
+    // Handle credentials update
+    sock.ev.on("creds.update", saveCreds);
 
-  sock.ev.on("messages.upsert", async (event) => {
-    if (event.type === "notify") {
-      for (const msg of event.messages) {
-        if (msg.message?.conversation || msg.message?.extendedTextMessage?.text) {
-          const text = msg.message?.conversation || msg.message?.extendedTextMessage?.text;
+    await config.callDB.init();
+    setupAntiCall(sock, config.callDB, botLogger);
+    // Handle group updates
+    sock.ev.on("groups.update", async (events) => {
+      for (const event of events) {
+        try {
+          const metadata = await sock.groupMetadata(event.id);
+          groupCache.set(event.id, metadata);
+        } catch (error) {
+          botLogger.error("Error updating group metadata:", error);
+        }
+      }
+    });
 
-          if (text === "requestPlaceholder") {
-            const messageId = await sock.requestPlaceholderResend(msg.key);
-            console.log("Requested placeholder resync, id =", messageId);
-          }
+    // Handle group participants update
+    sock.ev.on("group-participants.update", async (event) => {
+      try {
+        const metadata = await sock.groupMetadata(event.id);
+        groupCache.set(event.id, metadata);
+      } catch (error) {
+        botLogger.error("Error updating group participants:", error);
+      }
+    });
 
-          if (text === "onDemandHistSync") {
-            const messageId = await sock.fetchMessageHistory(50, msg.key, msg.messageTimestamp);
-            console.log("Requested on-demand sync, id =", messageId);
-          }
+    // Create message handler with registry integration
+    const messageHandler = createMessageHandler(
+      sock,
+      registry,
+      botLogger,
+      groupCache,
+      queue
+    );
 
-          if (!msg.key.fromMe && doReplies && !isJidNewsletter(msg.key?.remoteJid)) {
-            console.log("Replying to", msg.key.remoteJid);
-            await sock.readMessages([msg.key]);
-            await sendMessageWTyping({ text: "Hello there!" }, msg.key.remoteJid, sock);
+    sock.ev.on("messages.upsert", messageHandler);
+
+    // Handle connection updates
+    sock.ev.on("connection.update", async (update) => {
+      const { connection, lastDisconnect, qr } = update;
+
+      // Handle QR code
+      if (qr) {
+        console.log("QR RECEIVED");
+        qrcode.generate(qr, { small: true });
+
+        // Pairing code example (disabled by default)
+        const pairingCodeEnabled = false;
+        if (pairingCodeEnabled && !pairingCodeRequested) {
+          try {
+            const pairingCode = await sock.requestPairingCode(
+              prompt("Please enter your name:")
+            );
+            console.log("Pairing code enabled, code: " + pairingCode);
+            pairingCodeRequested = true;
+          } catch (error) {
+            console.error("Error requesting pairing code:", error);
           }
         }
       }
-    }
-  });
 
-  sock.ev.on("connection.update", async ({ connection, lastDisconnect, qr }) => {
-    if (qr) qrcode.generate(qr, { small: true });
+      // Handle connection status
+      if (connection === "close") {
+        const shouldReconnect =
+          lastDisconnect?.error instanceof Boom.Boom &&
+          lastDisconnect.error.output?.statusCode !==
+            DisconnectReason.loggedOut;
 
-    if (connection === "close") {
-      const shouldReconnect =
-        lastDisconnect?.error instanceof Boom.Boom &&
-        lastDisconnect.error.output?.statusCode !== DisconnectReason.loggedOut;
-
-      if (shouldReconnect) {
-        console.log("Reconnecting...");
-        await initBot();
-      } else {
-        console.log("Logged out.");
+        if (shouldReconnect) {
+          console.log("Connection closed, reconnecting...");
+          await delay(2000);
+          await initBot();
+        } else {
+          console.log("Connection logged out. Please scan QR again.");
+        }
+      } else if (connection === "open") {
+        console.log("✅ Bot connected successfully!");
+        console.log("Bot Number:", sock.user?.id);
+        console.log("Bot Name:", sock.user?.name);
+        botLogger.info("Bot is ready to receive messages!");
+      } else if (connection === "connecting") {
+        console.log("🔄 Connecting to WhatsApp...");
       }
-    }
-  });
+    });
+
+    return sock;
+  } catch (error) {
+    botLogger.error("Error initializing bot:", error);
+    throw error;
+  }
 }
