@@ -1,0 +1,54 @@
+{
+  "msgUnvaible": "The feature ${messages} is not available. Use /help to see all available features.",
+  "botStatus": "🤖 The bot is active and ready to help!",
+  "desc": {
+    "help": "${config.prefix}help to see all bot features.",
+    "ping": "${config.prefix}ping to check if the bot is lagging or has errors.",
+    "changelog": "${config.prefix}changelog to view the latest bot version updates.",
+    "info": "${config.prefix}info to display general information about the bot."
+  },
+  "error": {
+    "global": {
+      "unexpected": "❌ An unexpected error occurred.",
+      "invalidCommand": "❌ Invalid command. Use /help to see the list of commands.",
+      "noPermission": "⛔ You do not have permission to use this command.",
+      "cooldown": "⏳ Please wait before using this command again.",
+      "notOwner": "❌ This command can only be used by the bot owner.",
+      "notAdmin": "⚠️ This command is for group admins only.",
+      "onlyGroup": "⚠️ This command can only be used in group chats.",
+      "onlyPrivate": "⚠️ This command can only be used in private chats."
+    },
+    "input": {
+      "missingArgs": "❗ Please provide the required arguments!",
+      "invalidNumber": "⚠️ Invalid number. It must be numeric!",
+      "invalidLink": "⚠️ Invalid link. Make sure the format is correct.",
+      "unsupported": "❌ Unsupported format or file type."
+    }
+  },
+  "response": {
+    "success": "✅ Success!",
+    "saved": "💾 Data saved successfully!",
+    "deleted": "🗑️ Data deleted successfully!",
+    "cancelled": "❌ Cancelled.",
+    "loading": "⏳ Processing, please wait...",
+    "alreadyDone": "⚠️ This action has already been performed."
+  },
+  "user": {
+    "setLanguage": "🌐 Language has been changed to ${langName}.",
+    "notRegistered": "⚠️ You are not registered. Use /register to start.",
+    "alreadyRegistered": "⚠️ You are already registered.",
+    "notPremium": "🔒 This feature is only available to premium users.",
+    "premiumOnly": "💎 This command is exclusive to premium members."
+  },
+  "group": {
+    "welcome": "👋 Welcome @${user} to *${groupName}*!",
+    "goodbye": "👋 @${user} has left the group *${groupName}*.",
+    "tagAll": "📢 Tagging all group members:\n\n${mentions}"
+  },
+  "misc": {
+    "processing": "🔄 Processing...",
+    "done": "✅ Done!",
+    "retry": "🔁 Please try again...",
+    "unknown": "❓ Unknown."
+  }
+}

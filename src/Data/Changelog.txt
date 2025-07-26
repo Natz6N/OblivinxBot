@@ -15,3 +15,14 @@
 > fix error untuk registry command dan mengarahkan ke yang benar :V
 > Tambah Command dan tambah database 
 
+# *Version 0.0.4*
+
+> benerin error bagian antrian message
+> benerin error bagian messagehandler
+> benerin error bagian database 
+> tambah fitur lang tapi masih ngebug 
+> tambah fitur sticker
+
+# *Version 0.0.5*
+
+>

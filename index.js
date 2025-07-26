@@ -1,3 +1,4 @@
+import fileManager from "../FileManager.js";
 import initBot from "./src/bot.js";
 import MessageQueue from "./src/Clients/MessageQueue.js"; // path sesuai struktur kamu
 import config from "./src/config.js";
@@ -45,12 +46,14 @@ queue.setDefaultHandler(async (msg) => {
 
 // 3. Jalankan bot dan pass queue-nya
 (async () => {
-  // Inisialisasi database terlebih dahulu
-  await Promise.all([
-    config.callDB.init(),
-    config.userDB.init(),
-    config.ownerDB.init(),
-  ]);
+  await config.initDatabases();
+  process.on("uncaughtException", (err) => {
+    console.error("[UNCAUGHT EXCEPTION]", err.stack || err);
+  });
 
+  process.on("unhandledRejection", (reason) => {
+    console.error("[UNHANDLED REJECTION]", reason.stack || reason);
+  });
+  setInterval(() => fileManager.cleanTempFiles(), 10 * 60 * 1000);
   await initBot(queue); // kirim queue ke dalam bot.js
 })();

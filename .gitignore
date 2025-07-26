@@ -3,3 +3,8 @@ package-lock.json
 __oblivinx_auth
 src/Data/JSON
 src/Data/Backup
+.env
+.env.productions
+.env.production
+.env.development
+*.exe

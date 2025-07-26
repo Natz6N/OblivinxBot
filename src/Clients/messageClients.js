@@ -1,8 +1,9 @@
-import { isJidNewsletter } from "@whiskeysockets/baileys";
+import { isJidNewsletter, downloadMediaMessage } from "@whiskeysockets/baileys";
 import { readdirSync } from "fs";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
-
+import fileManager from "../FileManagers/FileManager.js";
+import { botLogger } from "../bot.js";
 // Get current directory for ES modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -58,6 +59,35 @@ async function sendMessageWithTyping(messageContent, jid, sock, botLogger) {
     throw error;
   }
 }
+async function downloadProfilePicture(sock, jid) {
+  try {
+    const ppUrl = await sock.profilePictureUrl(jid, "image");
+
+    const response = await fetch(ppUrl);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch image: ${response.statusText}`);
+    }
+
+    const arrayBuffer = await response.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+
+    const savedFile = await fileManager.saveFile(
+      buffer,
+      `${jid.replace(/[@:\.]/g, "_")}.png`,
+      "temp"
+    );
+
+    if (!savedFile.success) {
+      throw new Error("Gagal menyimpan file: " + savedFile.error);
+    }
+
+    console.log(`✅ Profile picture downloaded for ${jid}`);
+    return buffer; // ✅ Ini penting!
+  } catch (error) {
+    console.error(`❌ Error downloading profile picture for ${jid}:`, error);
+    return null; // ⛑️ Tangani error di atas
+  }
+}
 
 /**
  * Extract text content from various message types
@@ -71,9 +101,9 @@ function extractTextContent(message) {
   const messageData = message[messageType];
 
   if (!messageData) return "";
- // Jika messageData langsung berupa string (contoh: conversation)
+  // Jika messageData langsung berupa string (contoh: conversation)
   if (typeof messageData === "string") return messageData;
-  
+
   // Ekstrak dari berbagai tipe message yang umum digunakan
   const textSources = [
     messageData.text, // Untuk textMessage
@@ -85,8 +115,9 @@ function extractTextContent(message) {
     messageData.contextInfo?.quotedMessage?.conversation, // Quoted basic
     messageData.contextInfo?.quotedMessage?.extendedTextMessage?.text, // Quoted extended
   ];
+  console.log(textSources);
   console.log("Incoming message type:", Object.keys(message));
-  console.log("Message data:", message[Object.keys(message)[0]]);
+  console.log("Incoming message type:", Object.keys(messageData));
 
   return (
     textSources.find((text) => typeof text === "string" && text.trim()) || ""
@@ -101,7 +132,6 @@ function extractTextContent(message) {
 async function extractMessageContent(msg) {
   try {
     const message = msg.message;
-    console.log(message);
     if (!message) {
       return { text: "", type: "unknown", hasMedia: false, isValid: false };
     }
@@ -214,7 +244,12 @@ async function loadCommands(registry, botLogger) {
             botLogger.warn(`⚠️ Invalid command file structure: ${file}`);
           }
         } catch (fileError) {
-          botLogger.error(`❌ Error loading command file ${file}:`, fileError);
+          botLogger.error(
+            `❌ Error loading command file ${file}:\n` +
+              (fileError.stack ||
+                fileError.message ||
+                JSON.stringify(fileError, null, 2))
+          );
         }
       }
 
@@ -238,9 +273,7 @@ async function loadCommands(registry, botLogger) {
  */
 async function handleBotMention(messageInfo) {
   const { text, isGroup, sock, sender, botLogger, registry } = messageInfo;
-
-  if (!isGroup || !text?.includes("@")) return false;
-
+  if (!isGroup || typeof text !== "string" || !text.includes("@")) return false;
   const botNumber = sock.user?.id?.split(":")[0];
   if (!botNumber || !text.includes(`@${botNumber}`)) return false;
 
@@ -383,7 +416,6 @@ export async function handleIncomingMessage(
     if (!msg.message || msg.key.fromMe) return;
 
     const sender = msg.key.remoteJid;
-    console.log(sender);
     if (!sender) {
       botLogger.warn("Message ignored: invalid sender");
       return;
@@ -402,11 +434,22 @@ export async function handleIncomingMessage(
       botLogger.debug(`Invalid/empty message ignored from: ${sender}`);
       return;
     }
+    // Check if this is a button response
+    const messageType = Object.keys(msg.message)[0];
+    const isButtonResponse = [
+      "templateButtonReplyMessage",
+      "listResponseMessage",
+      "pollUpdateMessage",
+    ].includes(messageType);
 
     // Log incoming message
     botLogger.info(
       `📨 Incoming ${
-        messageContent.hasMedia ? "[Media]" : "text"
+        isButtonResponse
+          ? "[Button Response]"
+          : messageContent.hasMedia
+          ? "[Media]"
+          : "text"
       } from ${sender}: ${
         messageContent.text
           ? messageContent.text.substring(0, 50) +
@@ -432,42 +475,29 @@ export async function handleIncomingMessage(
     }
 
     // FIXED: Create comprehensive message info object with registry reference
-    const messageInfo = {
-      // Core message data
+   const messageInfo = {
       sender,
       participant: participantId,
       text: messageContent.text,
       message: msg.message,
       raw: msg,
-
-      // Message type info
       hasMedia: messageContent.hasMedia,
       messageType: messageContent.type,
       messageData: messageContent.messageData,
-
-      // Context info
       isGroup,
       isAdmin,
-      mentions:
-        msg.message?.extendedTextMessage?.contextInfo?.mentionedJid || [],
-
-      // System objects - ADDED registry reference
+      isButtonResponse, // Add this flag
+      mentions: msg.message?.extendedTextMessage?.contextInfo?.mentionedJid || [],
       sock,
       registry,
       botLogger,
-
-      // Timestamps
       timestamp: msg.messageTimestamp,
       receivedAt: Date.now(),
     };
-
-    // REMOVED: Direct command processing - now handled by queue
-    // The queue will handle both command and non-command messages appropriately
-
     // Add to processing queue
     queue.enqueue(messageInfo, {
-      isPremium: isAdmin, // Prioritize admin messages
-      priority: messageContent.text?.startsWith(registry.prefix)
+      isPremium: isAdmin,
+      priority: (messageContent.text?.startsWith(registry.prefix) || isButtonResponse)
         ? "high"
         : "normal",
     });
@@ -483,4 +513,5 @@ export {
   getGroupMetadata,
   isUserAdmin,
   loadCommands, // ADDED: Export loadCommands for manual usage
+  downloadProfilePicture,
 };

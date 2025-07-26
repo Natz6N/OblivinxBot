@@ -1,0 +1,66 @@
+{
+  "msgUnvaible": "Fitur ${messages} tidak ada. Gunakan /help untuk melihat semua fitur.",
+  "botStatus": "🤖 Bot sedang aktif dan siap membantu!",
+  "desc": {
+    "help": "${config.prefix}help untuk mengetahui semua fitur bot.",
+    "ping": "${config.prefix}ping untuk mengecek apakah bot lag/error.",
+    "changelog": "${config.prefix}changelog untuk melihat perubahan bot versi terbaru.",
+    "info": "${config.prefix}info untuk menampilkan informasi umum tentang bot."
+  },
+  "error": {
+    "global": {
+      "unexpected": "❌ Terjadi kesalahan yang tidak terduga.",
+      "invalidCommand": "❌ Perintah tidak valid. Gunakan /help untuk melihat daftar perintah.",
+      "noPermission": "⛔ Kamu tidak memiliki izin untuk menggunakan perintah ini.",
+      "cooldown": "⏳ Tunggu sebentar sebelum menggunakan perintah ini lagi.",
+      "notOwner": "❌ Perintah ini hanya dapat digunakan oleh pemilik bot.",
+      "notAdmin": "⚠️ Perintah ini hanya untuk admin grup.",
+      "onlyGroup": "⚠️ Perintah ini hanya bisa digunakan di dalam grup.",
+      "onlyPrivate": "⚠️ Perintah ini hanya bisa digunakan di chat pribadi."
+    },
+    "input": {
+      "missingArgs": "❗ Masukkan argumen yang diperlukan!",
+      "invalidNumber": "⚠️ Nomor tidak valid. Harus berupa angka!",
+      "invalidLink": "⚠️ Link tidak valid. Pastikan format benar.",
+      "unsupported": "❌ Format atau tipe file tidak didukung."
+    }
+  },
+  "response": {
+    "success": "✅ Berhasil!",
+    "saved": "💾 Data berhasil disimpan!",
+    "deleted": "🗑️ Data berhasil dihapus!",
+    "cancelled": "❌ Dibatalkan.",
+    "loading": "⏳ Sedang diproses, mohon tunggu...",
+    "alreadyDone": "⚠️ Aksi ini sudah dilakukan sebelumnya.",
+    "responseFeature": {
+      "lang": {
+        "idLang": "❌ Silakan masukkan kode bahasa!\nContoh: /lang ID atau /lang EN",
+        "BahasaTersedia": "❌ Bahasa tidak didukung!\nBahasa yang tersedia: ${Language}",
+        "success": "Bahasa berhasil diubah ke *${selected}*!"
+      },
+      "help": {
+        "idLang": "❌ Silakan masukkan kode bahasa!\nContoh: /lang ID atau /lang EN",
+        "BahasaTersedia": "❌ Bahasa tidak didukung!\nBahasa yang tersedia: ${Language}",
+        "success": "Bahasa berhasil diubah ke *${selected}*!"
+      }
+    }
+  },
+  "user": {
+    "setLanguage": "🌐 Bahasa berhasil diubah menjadi ${langName}.",
+    "notRegistered": "⚠️ Kamu belum terdaftar. Gunakan /register untuk memulai.",
+    "alreadyRegistered": "⚠️ Kamu sudah terdaftar.",
+    "notPremium": "🔒 Fitur ini hanya tersedia untuk pengguna premium.",
+    "premiumOnly": "💎 Perintah ini khusus untuk member premium."
+  },
+  "group": {
+    "welcome": "👋 Selamat datang @${user} di grup *${groupName}*!",
+    "goodbye": "👋 @${user} telah keluar dari grup *${groupName}*.",
+    "tagAll": "📢 Tag semua anggota grup:\n\n${mentions}"
+  },
+  "misc": {
+    "processing": "🔄 Sedang diproses...",
+    "done": "✅ Selesai!",
+    "retry": "🔁 Coba lagi...",
+    "unknown": "❓ Tidak diketahui."
+  }
+}
