@@ -1,1 +1,798 @@
-const _0x17d865=_0x3977;function _0x558d(){const _0x4cc6c9=['Blocked\x20by\x20middleware','description','330055hVDTla','info\x20bot','function','getCommandStats','\x0aType\x20','set','entries','getAllCommands','from','changelog','general','owner','isowner','*\x20Trimakasih\x20sudah\x20menggunakan\x20bot\x20Kami.\x20\x0aJika\x20terdapat\x20bug\x20atau\x20bot\x20macet\x20hubungi\x20Owner\x0a\x0a*Bot\x20Commands*\x0a','Error\x20in\x20event\x20handler\x20for\x20','chat','obxInstances','Error\x20executing\x20command\x20','218302eeKsHL','./src/Data/Changelog.txt','successes','totalTime','This\x20command\x20can\x20only\x20be\x20used\x20in\x20groups','\x0a>\x20Uptime\x20\x20\x20\x20\x20:\x20','setOwners','owners','117OqBYje','clearCommands','startsWith','fromEntries','error','removeGlobalCommand','This\x20command\x20requires\x20owner\x20privileges','ceil','get','success','commands','prefix','allowed','middleware','pushName','Command\x20on\x20cooldown.\x20Wait\x20','toLowerCase','has','utf-8','category','help\x20[category]','commandError','6OxGOMU','🏓\x20Pong!\x0a⏱️\x20Response\x20time:\x20','sender','commandStats','checkCooldown','name','bot','Command\x20not\x20found','command','floor','isOwner','emit','adminBypass','slice','registerDefaultCommands','cooldowns','clear','message','*\x20Berikut\x20adalah\x20informasi\x20dari\x20Bot\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x0a>\x20Bot\x20Name\x20\x20\x20:\x20','368924zTTysB','participant','processMessage','menu','reason','info','log','\x0a>\x20Version\x20\x20\x20\x20:\x20','aliases','executions','help\x20to\x20see\x20available\x20commands.','cmd','remaining','\x0a>\x20Author\x20\x20\x20\x20\x20:\x20Natzsixn\x0a>\x20Repository\x20:\x20https://github.com/Natz6N/OblivinxBot\x0a\x0aType\x20','clearInstances','onCooldown','sock','forEach','1881952ejhyzK','ownerNumbers','trackCommand','use','split','delete','size','BotName','now','shift','includes','about','map','sendMessage','exec','cooldown','isAdmin','help','getCommandsByCategory','execute','This\x20command\x20requires\x20admin\x20privileges','uptime','length','getObxInstance','Error\x20processing\x20message:','isgroup','🤖\x20Hi\x20*','195587bMOnYe','isArray','353316BiZnQp','ping','12qiVIWy','Show\x20available\x20commands','logger','Check\x20bot\x20response\x20time','\x0a\x20\x20','failures','push','./src/media/OblivinxLogo.png','usage','globalCommands','version','\x0a>\x20prefix\x20\x20\x20\x20\x20:\x20','toUpperCase','raw','isGroup','addGlobalCommand','#\x20*','\x0a>\x20command\x20\x20\x20\x20:\x20','setPrefix','\x0aHallo\x20*','readFile','commandSuccess','trim','isadmin','filter','removeCommand','avgTime','mentions','Changelog','help\x20[category]\x20for\x20detailed\x20info','eventHandlers','Command\x20name\x20and\x20exec\x20function\x20are\x20required','116890oHktuz','Botinfo','\x20Commands:*\x0a','📊\x20*Berikut\x20adalah\x20Changelog*\x0a\x0a','Show\x20changelog','findCommand','add','checkPermissions'];_0x558d=function(){return _0x4cc6c9;};return _0x558d();}(function(_0x7fd8c4,_0x2b0de7){const _0x47c3d7=_0x3977,_0x26db49=_0x7fd8c4();while(!![]){try{const _0x3cbe12=-parseInt(_0x47c3d7(0xa3))/0x1+parseInt(_0x47c3d7(0xa5))/0x2+parseInt(_0x47c3d7(0x101))/0x3*(parseInt(_0x47c3d7(0x114))/0x4)+parseInt(_0x47c3d7(0xd1))/0x5*(-parseInt(_0x47c3d7(0xa7))/0x6)+parseInt(_0x47c3d7(0xe3))/0x7+parseInt(_0x47c3d7(0x88))/0x8+-parseInt(_0x47c3d7(0xeb))/0x9*(parseInt(_0x47c3d7(0xc7))/0xa);if(_0x3cbe12===_0x2b0de7)break;else _0x26db49['push'](_0x26db49['shift']());}catch(_0x3b58c7){_0x26db49['push'](_0x26db49['shift']());}}}(_0x558d,0x24210));import _0x28cdad from'fs/promises';function _0x3977(_0x224c4c,_0x4a3322){const _0x558d97=_0x558d();return _0x3977=function(_0x397712,_0x10772d){_0x397712=_0x397712-0x86;let _0x1ef864=_0x558d97[_0x397712];return _0x1ef864;},_0x3977(_0x224c4c,_0x4a3322);}import{downloadProfilePicture}from'./messageClients.js';import _0x1a39bd from'../config.js';class Obx{constructor(_0x34db51,_0x85b03c,_0x58ff08,_0x371bfc,_0x5a7418,_0xc75845){const _0x2d9d6f=_0x3977;this[_0x2d9d6f(0xe0)]=_0x34db51,this[_0x2d9d6f(0xd9)]=_0x85b03c,this[_0x2d9d6f(0xbe)]=_0x58ff08,this[_0x2d9d6f(0xc2)]=_0x371bfc,this[_0x2d9d6f(0x86)]=_0x5a7418,this[_0x2d9d6f(0xa9)]=_0xc75845||console,this[_0x2d9d6f(0xf5)]=new Map(),this[_0x2d9d6f(0xf8)]=[],this[_0x2d9d6f(0x110)]=new Map();}[_0x17d865(0x11f)](_0x2a7fae){const _0x4297f8=_0x17d865,{name:_0x488661,aliases:aliases=[],isadmin:isadmin=![],isowner:isowner=![],isgroup:isgroup=![],cooldown:cooldown=0x0,description:description='',usage:usage='',category:category=_0x4297f8(0xdb),exec:_0x533e2b}=_0x2a7fae;if(!_0x488661||typeof _0x533e2b!==_0x4297f8(0xd3))throw new Error(_0x4297f8(0xc6));const _0x44f85a={'name':_0x488661[_0x4297f8(0xfb)](),'aliases':aliases[_0x4297f8(0x94)](_0x43ca1f=>_0x43ca1f[_0x4297f8(0xfb)]()),'isadmin':isadmin,'isowner':isowner,'isgroup':isgroup,'cooldown':cooldown,'description':description,'usage':usage,'category':category,'exec':_0x533e2b};return this[_0x4297f8(0xf5)][_0x4297f8(0xd6)](_0x44f85a[_0x4297f8(0x106)],_0x44f85a),_0x44f85a[_0x4297f8(0x11c)][_0x4297f8(0x87)](_0xe7ffce=>{const _0x2411fb=_0x4297f8;this[_0x2411fb(0xf5)][_0x2411fb(0xd6)](_0xe7ffce,_0x44f85a);}),this;}[_0x17d865(0x8b)](_0x42c295){const _0x2aca26=_0x17d865;return typeof _0x42c295===_0x2aca26(0xd3)&&this[_0x2aca26(0xf8)][_0x2aca26(0xad)](_0x42c295),this;}[_0x17d865(0xcc)](_0x7628e1){const _0x12ec53=_0x17d865;return this[_0x12ec53(0xf5)][_0x12ec53(0xf3)](_0x7628e1[_0x12ec53(0xfb)]());}[_0x17d865(0x105)](_0x285aab,_0x53d909){const _0x2e78b7=_0x17d865,_0x48ac81=_0x285aab[_0x2e78b7(0x106)]+'_'+_0x53d909,_0x2e6492=Date[_0x2e78b7(0x90)](),_0x31cc4d=this[_0x2e78b7(0x110)][_0x2e78b7(0xf3)](_0x48ac81);if(_0x31cc4d&&_0x2e6492<_0x31cc4d){const _0x318d28=Math[_0x2e78b7(0xf2)]((_0x31cc4d-_0x2e6492)/0x3e8);return{'onCooldown':!![],'remaining':_0x318d28};}return _0x285aab[_0x2e78b7(0x97)]>0x0&&this[_0x2e78b7(0x110)][_0x2e78b7(0xd6)](_0x48ac81,_0x2e6492+_0x285aab[_0x2e78b7(0x97)]*0x3e8),{'onCooldown':![]};}async[_0x17d865(0x9b)](_0x149662,_0x5ed7df=[],_0x46b694={}){const _0x3c2505=_0x17d865,_0x2e8574=this[_0x3c2505(0xcc)](_0x149662);if(!_0x2e8574)return{'success':![],'error':_0x3c2505(0x108)};const _0x2a7b7d=this[_0x3c2505(0xce)](_0x2e8574,_0x46b694);if(!_0x2a7b7d[_0x3c2505(0xf7)])return{'success':![],'error':_0x2a7b7d[_0x3c2505(0x118)]};const _0x24f6cb=this[_0x3c2505(0x105)](_0x2e8574,_0x46b694[_0x3c2505(0x115)]||_0x46b694[_0x3c2505(0x103)]);if(_0x24f6cb[_0x3c2505(0x123)])return{'success':![],'error':_0x3c2505(0xfa)+_0x24f6cb[_0x3c2505(0x120)]+'s'};const _0x3030f9={'obx':this,'args':_0x5ed7df,'messageInfo':_0x46b694,'chat':this[_0x3c2505(0xe0)],'from':this[_0x3c2505(0xd9)],'isadmin':this[_0x3c2505(0xbe)],'mentions':this[_0x3c2505(0xc2)],'sock':this[_0x3c2505(0x86)],'logger':this[_0x3c2505(0xa9)],'reply':async(_0x2fe34a,_0x5973b7={})=>{const _0x95eb6b=_0x3c2505;return await this[_0x95eb6b(0x86)][_0x95eb6b(0x95)](_0x46b694[_0x95eb6b(0x103)],{'text':_0x2fe34a,..._0x5973b7});},'replyWithMention':async(_0x23f450,_0x1cc230={})=>{const _0x359e80=_0x3c2505;return await this[_0x359e80(0x86)][_0x359e80(0x95)](_0x46b694[_0x359e80(0x103)],{'text':'@'+(_0x46b694[_0x359e80(0x115)]?.[_0x359e80(0x8c)]('@')[0x0]||_0x46b694[_0x359e80(0x103)][_0x359e80(0x8c)]('@')[0x0])+'\x20'+_0x23f450,'mentions':[_0x46b694[_0x359e80(0x115)]||_0x46b694[_0x359e80(0x103)]],..._0x1cc230});}};try{for(const _0x181550 of this[_0x3c2505(0xf8)]){const _0x315e04=await _0x181550(_0x3030f9);if(_0x315e04===![])return{'success':![],'error':_0x3c2505(0xcf)};}return await _0x2e8574[_0x3c2505(0x96)](_0x3030f9),{'success':!![]};}catch(_0x46df58){return this[_0x3c2505(0xa9)][_0x3c2505(0xef)](_0x3c2505(0xe2)+_0x149662+':',_0x46df58),{'success':![],'error':_0x46df58[_0x3c2505(0x112)]};}}[_0x17d865(0xce)](_0x775e78,_0x2f111f){const _0x125f31=_0x17d865,{isGroup:_0x49b782,isAdmin:_0x566032,isOwner:_0x4d54c7}=_0x2f111f;if(_0x775e78[_0x125f31(0xa1)]&&!_0x49b782)return{'allowed':![],'reason':_0x125f31(0xe7)};if(_0x775e78[_0x125f31(0xbe)]&&!_0x566032)return{'allowed':![],'reason':_0x125f31(0x9c)};if(_0x775e78[_0x125f31(0xdd)]&&!_0x4d54c7)return{'allowed':![],'reason':_0x125f31(0xf1)};return{'allowed':!![]};}[_0x17d865(0xd8)](){const _0x4b408b=_0x17d865,_0x318df4=new Set(),_0xf9beb8=[];return this[_0x4b408b(0xf5)][_0x4b408b(0x87)](_0x65c670=>{const _0x4f2122=_0x4b408b;!_0x318df4[_0x4f2122(0xfc)](_0x65c670[_0x4f2122(0x106)])&&(_0x318df4[_0x4f2122(0xcd)](_0x65c670[_0x4f2122(0x106)]),_0xf9beb8[_0x4f2122(0xad)]({'name':_0x65c670[_0x4f2122(0x106)],'aliases':_0x65c670[_0x4f2122(0x11c)],'isadmin':_0x65c670[_0x4f2122(0xbe)],'isowner':_0x65c670[_0x4f2122(0xdd)],'isgroup':_0x65c670[_0x4f2122(0xa1)],'description':_0x65c670[_0x4f2122(0xd0)],'usage':_0x65c670[_0x4f2122(0xaf)],'category':_0x65c670[_0x4f2122(0xfe)]}));}),_0xf9beb8;}[_0x17d865(0x9a)](){const _0x3bde17=_0x17d865,_0x493c80={};return this[_0x3bde17(0xd8)]()[_0x3bde17(0x87)](_0x29258a=>{const _0x4304af=_0x3bde17,_0x2075a0=_0x29258a[_0x4304af(0xfe)]||_0x4304af(0xdb);!_0x493c80[_0x2075a0]&&(_0x493c80[_0x2075a0]=[]),_0x493c80[_0x2075a0][_0x4304af(0xad)](_0x29258a);}),_0x493c80;}[_0x17d865(0xec)](){const _0x46b26d=_0x17d865;return this[_0x46b26d(0xf5)][_0x46b26d(0x111)](),this;}[_0x17d865(0xc0)](_0x17d8e0){const _0x56aa40=_0x17d865,_0x5b50c7=this[_0x56aa40(0xf5)][_0x56aa40(0xf3)](_0x17d8e0[_0x56aa40(0xfb)]());if(_0x5b50c7)return this[_0x56aa40(0xf5)][_0x56aa40(0x8d)](_0x5b50c7[_0x56aa40(0x106)]),_0x5b50c7[_0x56aa40(0x11c)][_0x56aa40(0x87)](_0x36fa8f=>{const _0x318c92=_0x56aa40;this[_0x318c92(0xf5)][_0x318c92(0x8d)](_0x36fa8f);}),!![];return![];}}class MessageRegistry{constructor(_0x2a4c1c,_0x20cbe0,_0x5cb13d={}){const _0x2282d9=_0x17d865;this[_0x2282d9(0x86)]=_0x2a4c1c,this[_0x2282d9(0xa9)]=_0x20cbe0||console,this[_0x2282d9(0xf6)]=_0x5cb13d[_0x2282d9(0xf6)]||'!',this[_0x2282d9(0x89)]=_0x5cb13d[_0x2282d9(0xea)]||[],this[_0x2282d9(0x10d)]=_0x5cb13d[_0x2282d9(0x10d)]||![],this[_0x2282d9(0xe1)]=new Map(),this[_0x2282d9(0xb0)]=new Map(),this[_0x2282d9(0xf8)]=[],this[_0x2282d9(0xc5)]=new Map(),this[_0x2282d9(0x104)]=new Map();}[_0x17d865(0xb9)](_0x149104){const _0x128966=_0x17d865;return this[_0x128966(0xf6)]=_0x149104,this;}[_0x17d865(0xe9)](_0x27f6d1){const _0x43e6ee=_0x17d865;return this[_0x43e6ee(0x89)]=Array[_0x43e6ee(0xa4)](_0x27f6d1)?_0x27f6d1:[_0x27f6d1],this;}[_0x17d865(0x8b)](_0x45231d){const _0x37890f=_0x17d865;return typeof _0x45231d===_0x37890f(0xd3)&&this[_0x37890f(0xf8)][_0x37890f(0xad)](_0x45231d),this;}['on'](_0x1b71a8,_0x8a9677){const _0x4257d6=_0x17d865;return!this[_0x4257d6(0xc5)][_0x4257d6(0xfc)](_0x1b71a8)&&this[_0x4257d6(0xc5)][_0x4257d6(0xd6)](_0x1b71a8,[]),this[_0x4257d6(0xc5)][_0x4257d6(0xf3)](_0x1b71a8)[_0x4257d6(0xad)](_0x8a9677),this;}async[_0x17d865(0x10c)](_0x1c1724,_0xda5c36){const _0x5616d3=_0x17d865,_0x396c94=this[_0x5616d3(0xc5)][_0x5616d3(0xf3)](_0x1c1724)||[];for(const _0x44d0ca of _0x396c94){try{await _0x44d0ca(_0xda5c36);}catch(_0x3b0b7d){this[_0x5616d3(0xa9)][_0x5616d3(0xef)](_0x5616d3(0xdf)+_0x1c1724+':',_0x3b0b7d);}}}async[_0x17d865(0x116)](_0x354280){const _0x26e52a=_0x17d865,_0x48f4d8=Date[_0x26e52a(0x90)]();try{const {text:_0x68cf57,sender:_0x6ddb19,isGroup:_0x42e853}=_0x354280;if(!_0x68cf57||!_0x68cf57[_0x26e52a(0xed)](this[_0x26e52a(0xf6)]))return;const _0xc4ddd7=_0x68cf57[_0x26e52a(0x10e)](this[_0x26e52a(0xf6)][_0x26e52a(0x9e)])[_0x26e52a(0xbd)]()[_0x26e52a(0x8c)](/\s+/),_0x25005c=_0xc4ddd7[_0x26e52a(0x91)]()?.[_0x26e52a(0xfb)]();if(!_0x25005c)return;await this[_0x26e52a(0x10c)](_0x26e52a(0x109),{'commandName':_0x25005c,'args':_0xc4ddd7,'messageInfo':_0x354280});const _0x5b1871=this[_0x26e52a(0x9f)](_0x6ddb19,_0x354280),_0x15398c=this[_0x26e52a(0x10b)](_0x354280[_0x26e52a(0x115)]||_0x6ddb19),_0x586c8c=_0x354280[_0x26e52a(0x98)]||this[_0x26e52a(0x10d)]&&_0x15398c,_0x1b9248=await _0x5b1871[_0x26e52a(0x9b)](_0x25005c,_0xc4ddd7,{..._0x354280,'isOwner':_0x15398c,'isAdmin':_0x586c8c});this[_0x26e52a(0x8a)](_0x25005c,_0x1b9248[_0x26e52a(0xf4)],Date[_0x26e52a(0x90)]()-_0x48f4d8),!_0x1b9248[_0x26e52a(0xf4)]?(await this[_0x26e52a(0x86)][_0x26e52a(0x95)](_0x6ddb19,{'text':'❌\x20'+_0x1b9248[_0x26e52a(0xef)]}),await this[_0x26e52a(0x10c)](_0x26e52a(0x100),{'commandName':_0x25005c,'error':_0x1b9248[_0x26e52a(0xef)],'messageInfo':_0x354280})):await this[_0x26e52a(0x10c)](_0x26e52a(0xbc),{'commandName':_0x25005c,'messageInfo':_0x354280});}catch(_0x5c2858){this[_0x26e52a(0xa9)][_0x26e52a(0xef)](_0x26e52a(0xa0),_0x5c2858),await this[_0x26e52a(0x10c)](_0x26e52a(0xef),{'error':_0x5c2858,'messageInfo':_0x354280});}}[_0x17d865(0x8a)](_0x208017,_0x48922e,_0x14f63a){const _0xb876a2=_0x17d865;!this[_0xb876a2(0x104)][_0xb876a2(0xfc)](_0x208017)&&this[_0xb876a2(0x104)][_0xb876a2(0xd6)](_0x208017,{'executions':0x0,'successes':0x0,'failures':0x0,'totalTime':0x0,'avgTime':0x0});const _0x168e81=this[_0xb876a2(0x104)][_0xb876a2(0xf3)](_0x208017);_0x168e81[_0xb876a2(0x11d)]++,_0x168e81[_0xb876a2(0xe6)]+=_0x14f63a,_0x168e81[_0xb876a2(0xc1)]=_0x168e81[_0xb876a2(0xe6)]/_0x168e81[_0xb876a2(0x11d)],_0x48922e?_0x168e81[_0xb876a2(0xe5)]++:_0x168e81[_0xb876a2(0xac)]++;}[_0x17d865(0xd4)](){const _0x505bdf=_0x17d865;return Object[_0x505bdf(0xee)](this[_0x505bdf(0x104)]);}[_0x17d865(0x9f)](_0x2ee90f,_0x131b25){const _0x373a47=_0x17d865;if(!this[_0x373a47(0xe1)][_0x373a47(0xfc)](_0x2ee90f)){const _0x55e44b=new Obx(_0x2ee90f,_0x131b25[_0x373a47(0x103)],_0x131b25[_0x373a47(0x98)]||![],_0x131b25[_0x373a47(0xc2)]||[],this[_0x373a47(0x86)],this[_0x373a47(0xa9)]);this[_0x373a47(0xf8)][_0x373a47(0x87)](_0x42e00d=>{const _0xd7bfd1=_0x373a47;_0x55e44b[_0xd7bfd1(0x8b)](_0x42e00d);}),this[_0x373a47(0xb0)][_0x373a47(0x87)](_0x521c64=>{const _0x2de8bb=_0x373a47;_0x55e44b[_0x2de8bb(0x11f)](_0x521c64);}),this[_0x373a47(0x10f)](_0x55e44b),this[_0x373a47(0xe1)][_0x373a47(0xd6)](_0x2ee90f,_0x55e44b);}return this[_0x373a47(0xe1)][_0x373a47(0xf3)](_0x2ee90f);}[_0x17d865(0x10b)](_0x15c159){const _0x510126=_0x17d865,_0x1f80ad=_0x15c159?.[_0x510126(0x8c)]('@')[0x0];return this[_0x510126(0x89)][_0x510126(0x92)](_0x1f80ad);}[_0x17d865(0x10f)](_0x37439c){const _0x46d0a4=_0x17d865;_0x37439c[_0x46d0a4(0x11f)]({'name':_0x46d0a4(0x99),'aliases':[_0x46d0a4(0x117),'h'],'description':_0x46d0a4(0xa8),'usage':this[_0x46d0a4(0xf6)]+_0x46d0a4(0xff),'category':_0x46d0a4(0xdb),'exec':async({args:_0x536b57,messageInfo:_0x336fe7,reply:_0x47d749,sock:_0x52b302})=>{const _0x2d590c=_0x46d0a4;try{const {sender:_0x278ca0}=_0x336fe7,_0x24df32=_0x37439c[_0x2d590c(0x9a)](),_0x43c975=_0x536b57[0x0]?.[_0x2d590c(0xfb)](),_0x55b5b0=_0x336fe7[_0x2d590c(0xb4)][_0x2d590c(0xf9)];let _0x3d90d4=_0x2d590c(0xba)+_0x55b5b0+_0x2d590c(0xde);_0x43c975&&_0x24df32[_0x43c975]?(_0x3d90d4+='*'+_0x43c975[_0x2d590c(0xb3)]()+_0x2d590c(0xc9),_0x24df32[_0x43c975][_0x2d590c(0x87)](_0xdea8b8=>{const _0x588711=_0x2d590c;_0x3d90d4+='>\x20'+this[_0x588711(0xf6)]+_0xdea8b8[_0x588711(0x106)],_0xdea8b8[_0x588711(0xd0)]&&(_0x3d90d4+=_0x588711(0xab)+_0xdea8b8[_0x588711(0xd0)]),_0x3d90d4+='\x0a\x0a';})):(Object[_0x2d590c(0xd7)](_0x24df32)[_0x2d590c(0x87)](([_0x437fa6,_0x37c415])=>{const _0x13f490=_0x2d590c,_0xfc927c=_0x37c415[_0x13f490(0xbf)](_0x2d0f36=>{const _0xc35900=_0x13f490;if(_0x2d0f36[_0xc35900(0xdd)]&&!_0x336fe7[_0xc35900(0x10b)])return![];if(_0x2d0f36[_0xc35900(0xbe)]&&!_0x336fe7[_0xc35900(0x98)])return![];if(_0x2d0f36[_0xc35900(0xa1)]&&!_0x336fe7[_0xc35900(0xb5)])return![];return!![];});_0xfc927c[_0x13f490(0x9e)]>0x0&&(_0x3d90d4+=_0x13f490(0xb7)+_0x437fa6[_0x13f490(0xb3)]()+_0x13f490(0xc9),_0xfc927c[_0x13f490(0x87)](_0x29f88a=>{const _0x69006a=_0x13f490;_0x3d90d4+='>\x20'+this[_0x69006a(0xf6)]+_0x29f88a[_0x69006a(0x106)],_0x3d90d4+='\x0a';}),_0x3d90d4+='\x0a');}),_0x3d90d4+=_0x2d590c(0xd5)+this[_0x2d590c(0xf6)]+_0x2d590c(0xc4)),await this[_0x2d590c(0x86)][_0x2d590c(0x95)](_0x278ca0,{'text':_0x3d90d4},{'quoted':_0x336fe7[_0x2d590c(0xb4)]});}catch(_0x273e9e){console[_0x2d590c(0x11a)](_0x273e9e);}}}),_0x37439c[_0x46d0a4(0x11f)]({'name':_0x46d0a4(0xa6),'aliases':['p'],'description':_0x46d0a4(0xaa),'usage':this[_0x46d0a4(0xf6)]+_0x46d0a4(0xa6),'category':_0x46d0a4(0xdb),'cooldown':0x3,'exec':async({reply:_0x50af91,messageInfo:_0x4edd0d})=>{const _0x3b4fcf=_0x46d0a4,_0x194efa=Date[_0x3b4fcf(0x90)](),_0x42296c=Date[_0x3b4fcf(0x90)]();setTimeout(async()=>{const _0x39266e=_0x3b4fcf;await _0x50af91(_0x39266e(0x102)+(_0x42296c-_0x194efa)+'ms');},0x64);}}),_0x37439c[_0x46d0a4(0x11f)]({'name':_0x46d0a4(0x119),'aliases':[_0x46d0a4(0x93),_0x46d0a4(0x107)],'description':_0x46d0a4(0xd2),'usage':this[_0x46d0a4(0xf6)]+_0x46d0a4(0x119),'category':_0x46d0a4(0xdb),'exec':async({reply:_0x28780e,messageInfo:_0x5c991e})=>{const _0x41d305=_0x46d0a4,{sender:_0x5a362c}=_0x5c991e,_0x592b07=Math[_0x41d305(0x10a)](_0x37439c[_0x41d305(0xf5)][_0x41d305(0x8e)]/0x2),_0x5b7a01=process[_0x41d305(0x9d)](),_0x213d19=_0x5c991e[_0x41d305(0xb4)][_0x41d305(0xf9)],_0x20eaf2=Math[_0x41d305(0x10a)](_0x5b7a01/0xe10)+'h\x20'+Math[_0x41d305(0x10a)](_0x5b7a01%0xe10/0x3c)+'m\x20'+Math[_0x41d305(0x10a)](_0x5b7a01%0x3c)+'s',_0x7721d3=_0x41d305(0xa2)+_0x213d19+_0x41d305(0x113)+_0x1a39bd[_0x41d305(0xc8)][_0x41d305(0x8f)]+_0x41d305(0x11b)+_0x1a39bd[_0x41d305(0xc8)][_0x41d305(0xb1)]+_0x41d305(0xe8)+_0x20eaf2+_0x41d305(0xb8)+_0x592b07+_0x41d305(0xb2)+this[_0x41d305(0xf6)]+_0x41d305(0x121)+this[_0x41d305(0xf6)]+_0x41d305(0x11e);await this[_0x41d305(0x86)][_0x41d305(0x95)](_0x5a362c,{'image':{'url':_0x41d305(0xae)},'caption':_0x7721d3},{'quoted':_0x5c991e[_0x41d305(0xb4)]});}}),_0x37439c[_0x46d0a4(0x11f)]({'name':_0x46d0a4(0xc3),'description':_0x46d0a4(0xcb),'usage':this[_0x46d0a4(0xf6)]+_0x46d0a4(0xda),'category':_0x46d0a4(0xdc),'isowner':!![],'exec':async({reply:_0x1e1cc2})=>{const _0x4f1422=_0x46d0a4,_0x3afc40=await _0x28cdad[_0x4f1422(0xbb)](_0x4f1422(0xe4),_0x4f1422(0xfd));let _0x5b0eb6=_0x4f1422(0xca)+_0x3afc40;await _0x1e1cc2(_0x5b0eb6);}});}[_0x17d865(0xb6)](_0x4a0056){const _0x1df466=_0x17d865;return this[_0x1df466(0xb0)][_0x1df466(0xd6)](_0x4a0056[_0x1df466(0x106)],_0x4a0056),this[_0x1df466(0xe1)][_0x1df466(0x87)](_0x403455=>{const _0x5b00b5=_0x1df466;_0x403455[_0x5b00b5(0x11f)](_0x4a0056);}),this;}[_0x17d865(0xf0)](_0x4ae285){const _0x1a4b99=_0x17d865;return this[_0x1a4b99(0xb0)][_0x1a4b99(0x8d)](_0x4ae285),this[_0x1a4b99(0xe1)][_0x1a4b99(0x87)](_0x443130=>{const _0x273bb8=_0x1a4b99;_0x443130[_0x273bb8(0xc0)](_0x4ae285);}),this;}[_0x17d865(0x122)](){const _0x5539e7=_0x17d865;return this[_0x5539e7(0xe1)][_0x5539e7(0x111)](),this;}}export{Obx,MessageRegistry};
+import fs from "fs/promises"; // ES Module
+import { downloadProfilePicture } from "./messageClients.js";
+import config from "../config.js";
+
+// Enhanced Obx class with better functionality
+class Obx {
+  constructor(chat, from, isadmin, mentions, sock, logger) {
+    this.chat = chat;
+    this.from = from;
+    this.isadmin = isadmin;
+    this.mentions = mentions;
+    this.sock = sock;
+    this.logger = logger || console;
+    this.commands = new Map();
+    this.middleware = [];
+    this.cooldowns = new Map();
+  }
+
+  // Register command with enhanced options
+  cmd(config) {
+    const {
+      name,
+      aliases = [],
+      isadmin = false,
+      isowner = false,
+      isgroup = false,
+      cooldown = 0,
+      description = "",
+      usage = "",
+      category = "general",
+      exec,
+    } = config;
+
+    if (!name || typeof exec !== "function") {
+      throw new Error("Command name and exec function are required");
+    }
+
+    const command = {
+      name: name.toLowerCase(),
+      aliases: aliases.map((alias) => alias.toLowerCase()),
+      isadmin,
+      isowner,
+      isgroup,
+      cooldown,
+      description,
+      usage,
+      category,
+      exec,
+    };
+
+    // Register main command name
+    this.commands.set(command.name, command);
+
+    // Register aliases
+    command.aliases.forEach((alias) => {
+      this.commands.set(alias, command);
+    });
+
+    return this;
+  }
+
+  // Add middleware
+  use(middleware) {
+    if (typeof middleware === "function") {
+      this.middleware.push(middleware);
+    }
+    return this;
+  }
+
+  // Find command
+  findCommand(cmdName) {
+    return this.commands.get(cmdName.toLowerCase());
+  }
+
+  // Check cooldown
+  checkCooldown(command, userId) {
+    const key = `${command.name}_${userId}`;
+    const now = Date.now();
+    const cooldownEnd = this.cooldowns.get(key);
+
+    if (cooldownEnd && now < cooldownEnd) {
+      const remaining = Math.ceil((cooldownEnd - now) / 1000);
+      return { onCooldown: true, remaining };
+    }
+
+    // Set cooldown
+    if (command.cooldown > 0) {
+      this.cooldowns.set(key, now + command.cooldown * 1000);
+    }
+
+    return { onCooldown: false };
+  }
+
+  // Execute command with middleware support
+  async execute(cmdName, args = [], messageInfo = {}) {
+    const command = this.findCommand(cmdName);
+
+    if (!command) {
+      return { success: false, error: "Command not found" };
+    }
+
+    // Check permissions
+    const permissionCheck = this.checkPermissions(command, messageInfo);
+    if (!permissionCheck.allowed) {
+      return { success: false, error: permissionCheck.reason };
+    }
+
+    // Check cooldown
+    const cooldownCheck = this.checkCooldown(
+      command,
+      messageInfo.participant || messageInfo.sender
+    );
+    if (cooldownCheck.onCooldown) {
+      return {
+        success: false,
+        error: `Command on cooldown. Wait ${cooldownCheck.remaining}s`,
+      };
+    }
+
+    // Create context
+    const context = {
+      obx: this,
+      args,
+      messageInfo,
+      chat: this.chat,
+      from: this.from,
+      isadmin: this.isadmin,
+      mentions: this.mentions,
+      sock: this.sock,
+      logger: this.logger,
+      reply: async (text, options = {}) => {
+        return await this.sock.sendMessage(messageInfo.sender, {
+          text: text,
+          ...options,
+        });
+      },
+      replyWithMention: async (text, options = {}) => {
+        return await this.sock.sendMessage(messageInfo.sender, {
+          text: `@${
+            messageInfo.participant?.split("@")[0] ||
+            messageInfo.sender.split("@")[0]
+          } ${text}`,
+          mentions: [messageInfo.participant || messageInfo.sender],
+          ...options,
+        });
+      },
+    };
+
+    try {
+      // Run middleware
+      for (const middleware of this.middleware) {
+        const result = await middleware(context);
+        if (result === false) {
+          return { success: false, error: "Blocked by middleware" };
+        }
+      }
+
+      // Execute command
+      await command.exec(context);
+      return { success: true };
+    } catch (error) {
+      this.logger.error(`Error executing command ${cmdName}:`, error);
+      return { success: false, error: error.message };
+    }
+  }
+
+  // Check command permissions
+  checkPermissions(command, messageInfo) {
+    const { isGroup, isAdmin, isOwner } = messageInfo;
+
+    // Check if command requires group
+    if (command.isgroup && !isGroup) {
+      return {
+        allowed: false,
+        reason: "This command can only be used in groups",
+      };
+    }
+
+    // Check if command requires admin
+    if (command.isadmin && !isAdmin) {
+      return {
+        allowed: false,
+        reason: "This command requires admin privileges",
+      };
+    }
+
+    // Check if command requires owner
+    if (command.isowner && !isOwner) {
+      return {
+        allowed: false,
+        reason: "This command requires owner privileges",
+      };
+    }
+
+    return { allowed: true };
+  }
+
+  // Get all commands
+  getAllCommands() {
+    const uniqueCommands = new Set();
+    const commandList = [];
+
+    this.commands.forEach((command) => {
+      if (!uniqueCommands.has(command.name)) {
+        uniqueCommands.add(command.name);
+        commandList.push({
+          name: command.name,
+          aliases: command.aliases,
+          isadmin: command.isadmin,
+          isowner: command.isowner,
+          isgroup: command.isgroup,
+          description: command.description,
+          usage: command.usage,
+          category: command.category,
+        });
+      }
+    });
+
+    return commandList;
+  }
+
+  // Get commands by category
+  getCommandsByCategory() {
+    const categories = {};
+
+    this.getAllCommands().forEach((cmd) => {
+      const category = cmd.category || "general";
+      if (!categories[category]) {
+        categories[category] = [];
+      }
+      categories[category].push(cmd);
+    });
+
+    return categories;
+  }
+
+  // Clear all commands
+  clearCommands() {
+    this.commands.clear();
+    return this;
+  }
+
+  // Remove specific command
+  removeCommand(name) {
+    const command = this.commands.get(name.toLowerCase());
+    if (command) {
+      // Remove main command
+      this.commands.delete(command.name);
+      // Remove aliases
+      command.aliases.forEach((alias) => {
+        this.commands.delete(alias);
+      });
+      return true;
+    }
+    return false;
+  }
+}
+
+// Enhanced Message Registry
+class MessageRegistry {
+  constructor(sock, logger, options = {}) {
+    this.sock = sock;
+    this.logger = logger || console;
+    this.prefix = options.prefix || "!";
+    this.ownerNumbers = options.owners || [];
+    this.adminBypass = options.adminBypass || false;
+    this.obxInstances = new Map();
+    this.globalCommands = new Map();
+    this.middleware = [];
+    this.eventHandlers = new Map();
+
+    // Performance tracking
+    this.commandStats = new Map();
+  }
+
+  // Set command prefix
+  setPrefix(prefix) {
+    this.prefix = prefix;
+    return this;
+  }
+
+  // Set owner numbers
+  setOwners(numbers) {
+    this.ownerNumbers = Array.isArray(numbers) ? numbers : [numbers];
+    return this;
+  }
+
+  // Add global middleware
+  use(middleware) {
+    if (typeof middleware === "function") {
+      this.middleware.push(middleware);
+    }
+    return this;
+  }
+
+  // Register event handler
+  on(event, handler) {
+    if (!this.eventHandlers.has(event)) {
+      this.eventHandlers.set(event, []);
+    }
+    this.eventHandlers.get(event).push(handler);
+    return this;
+  }
+
+  // Emit event
+  async emit(event, data) {
+    const handlers = this.eventHandlers.get(event) || [];
+    for (const handler of handlers) {
+      try {
+        await handler(data);
+      } catch (error) {
+        this.logger.error(`Error in event handler for ${event}:`, error);
+      }
+    }
+  }
+
+  // Process incoming message with button response support
+  async processMessage(messageInfo) {
+    const startTime = Date.now();
+
+    try {
+      // Handle button response messages
+      if (messageInfo.raw?.message?.buttonsResponseMessage?.selectedButtonId) {
+        messageInfo.text =
+          messageInfo.raw.message.buttonsResponseMessage.selectedButtonId;
+        this.logger.info(`Button response detected: ${messageInfo.text}`);
+      }
+
+      // Handle list response messages (for future compatibility)
+      if (
+        messageInfo.raw?.message?.listResponseMessage?.singleSelectReply
+          ?.selectedRowId
+      ) {
+        messageInfo.text =
+          messageInfo.raw.message.listResponseMessage.singleSelectReply.selectedRowId;
+        this.logger.info(`List response detected: ${messageInfo.text}`);
+      }
+
+      const { text, sender, isGroup } = messageInfo;
+
+      if (!text || !text.startsWith(this.prefix)) return;
+
+      // Extract command and arguments
+      const args = text.slice(this.prefix.length).trim().split(/\s+/);
+      const commandName = args.shift()?.toLowerCase();
+
+      if (!commandName) return;
+
+      // Emit command event
+      await this.emit("command", { commandName, args, messageInfo });
+
+      // Create or get Obx instance for this chat
+      const obx = this.getObxInstance(sender, messageInfo);
+
+      // Determine user permissions
+      const isOwner = this.isOwner(messageInfo.participant || sender);
+      const isAdmin = messageInfo.isAdmin || (this.adminBypass && isOwner);
+
+      // Execute command
+      const result = await obx.execute(commandName, args, {
+        ...messageInfo,
+        isOwner,
+        isAdmin,
+      });
+
+      // Track command execution
+      this.trackCommand(commandName, result.success, Date.now() - startTime);
+
+      // Handle result
+      if (!result.success) {
+        await this.sock.sendMessage(sender, {
+          text: `❌ ${result.error}`,
+        });
+
+        // Emit error event
+        await this.emit("commandError", {
+          commandName,
+          error: result.error,
+          messageInfo,
+        });
+      } else {
+        // Emit success event
+        await this.emit("commandSuccess", {
+          commandName,
+          messageInfo,
+        });
+      }
+    } catch (error) {
+      this.logger.error("Error processing message:", error);
+      await this.emit("error", { error, messageInfo });
+    }
+  }
+
+  // Track command statistics
+  trackCommand(commandName, success, executionTime) {
+    if (!this.commandStats.has(commandName)) {
+      this.commandStats.set(commandName, {
+        executions: 0,
+        successes: 0,
+        failures: 0,
+        totalTime: 0,
+        avgTime: 0,
+      });
+    }
+
+    const stats = this.commandStats.get(commandName);
+    stats.executions++;
+    stats.totalTime += executionTime;
+    stats.avgTime = stats.totalTime / stats.executions;
+
+    if (success) {
+      stats.successes++;
+    } else {
+      stats.failures++;
+    }
+  }
+
+  // Get command statistics
+  getCommandStats() {
+    return Object.fromEntries(this.commandStats);
+  }
+
+  // Get or create Obx instance
+  getObxInstance(chatId, messageInfo) {
+    if (!this.obxInstances.has(chatId)) {
+      const obx = new Obx(
+        chatId,
+        messageInfo.sender,
+        messageInfo.isAdmin || false,
+        messageInfo.mentions || [],
+        this.sock,
+        this.logger
+      );
+
+      // Apply global middleware
+      this.middleware.forEach((middleware) => {
+        obx.use(middleware);
+      });
+
+      // Register global commands
+      this.globalCommands.forEach((command) => {
+        obx.cmd(command);
+      });
+
+      // Register default commands
+      this.registerDefaultCommands(obx);
+
+      this.obxInstances.set(chatId, obx);
+    }
+    return this.obxInstances.get(chatId);
+  }
+
+  // Check if user is owner
+  isOwner(jid) {
+    const phoneNumber = jid?.split("@")[0];
+    return this.ownerNumbers.includes(phoneNumber);
+  }
+
+  // Register default commands
+  registerDefaultCommands(obx) {
+    // Help command
+    obx.cmd({
+      name: "help",
+      aliases: ["menu", "h"],
+      description: "Show available commands",
+      usage: `${this.prefix}help [category]`,
+      category: "general",
+      exec: async ({ args, messageInfo, reply, sock }) => {
+        try {
+          const { sender } = messageInfo;
+          const categories = obx.getCommandsByCategory();
+          const requestedCategory = args[0]?.toLowerCase();
+
+          const names = messageInfo.raw.pushName;
+          let helpText = `
+Hallo *${names}* Trimakasih sudah menggunakan bot Kami. 
+Jika terdapat bug atau bot macet hubungi Owner
+
+*Bot Commands*
+`;
+
+          if (requestedCategory && categories[requestedCategory]) {
+            // Show specific category
+            helpText += `*${requestedCategory.toUpperCase()} Commands:*\n`;
+            categories[requestedCategory].forEach((cmd) => {
+              helpText += `> ${this.prefix}${cmd.name}`;
+              if (cmd.description) {
+                helpText += `\n  ${cmd.description}`;
+              }
+              helpText += "\n\n";
+            });
+          } else {
+            // Show all categories
+            Object.entries(categories).forEach(([category, commands]) => {
+              // Filter commands based on permissions
+              const visibleCommands = commands.filter((cmd) => {
+                if (cmd.isowner && !messageInfo.isOwner) return false;
+                if (cmd.isadmin && !messageInfo.isAdmin) return false;
+                if (cmd.isgroup && !messageInfo.isGroup) return false;
+                return true;
+              });
+
+              if (visibleCommands.length > 0) {
+                helpText += `# *${category.toUpperCase()} Commands:*\n`;
+                visibleCommands.forEach((cmd) => {
+                  helpText += `> ${this.prefix}${cmd.name}`;
+                  helpText += "\n";
+                });
+                helpText += "\n";
+              }
+            });
+
+            helpText += `\nType ${this.prefix}help [category] for detailed info`;
+          }
+
+          // Send help message with interactive buttons
+          await this.sock.sendMessage(
+            sender,
+            {
+              text: helpText,
+              buttons: [
+                {
+                  buttonId: `${this.prefix}ping`,
+                  buttonText: { displayText: "🏓 Ping" },
+                  type: 1,
+                },
+                {
+                  buttonId: `${this.prefix}info`,
+                  buttonText: { displayText: "ℹ️ Info" },
+                  type: 1,
+                },
+                {
+                  buttonId: `${this.prefix}help general`,
+                  buttonText: { displayText: "📚 General Commands" },
+                  type: 1,
+                },
+              ],
+              headerType: 1,
+            },
+            { quoted: messageInfo.raw }
+          );
+        } catch (err) {
+          console.log(err);
+          // Fallback to simple text if buttons fail
+          await reply(helpText);
+        }
+      },
+    });
+
+    // Ping command
+    obx.cmd({
+      name: "ping",
+      aliases: ["p"],
+      description: "Check bot response time",
+      usage: `${this.prefix}ping`,
+      category: "general",
+      cooldown: 3,
+      exec: async ({ reply, messageInfo }) => {
+        const start = Date.now();
+        const end = Date.now();
+
+        setTimeout(async () => {
+          await reply(`🏓 Pong!\n⏱️ Response time: ${end - start}ms`);
+        }, 100);
+      },
+    });
+
+    // Info command
+    obx.cmd({
+      name: "info",
+      aliases: ["about", "bot"],
+      description: "info bot",
+      usage: `${this.prefix}info`,
+      category: "general",
+      exec: async ({ reply, messageInfo }) => {
+        const { sender } = messageInfo;
+        const commandCount = Math.floor(obx.commands.size / 2);
+        const uptime = process.uptime();
+        const Namesender = messageInfo.raw.pushName;
+        const uptimeStr = `${Math.floor(uptime / 3600)}h ${Math.floor(
+          (uptime % 3600) / 60
+        )}m ${Math.floor(uptime % 60)}s`;
+
+        const info = `🤖 Hi *${Namesender}* Berikut adalah informasi dari Bot
+        
+> Bot Name   : ${config.Botinfo.BotName}
+> Version    : ${config.Botinfo.version}
+> Uptime     : ${uptimeStr}
+> command    : ${commandCount}
+> prefix     : ${this.prefix}
+> Author     : Natzsixn
+> Repository : https://github.com/Natz6N/OblivinxBot
+
+Type ${this.prefix}help to see available commands.`;
+
+        try {
+          await this.sock.sendMessage(
+            sender,
+            {
+              image: {
+                url: "./src/media/OblivinxLogo.png",
+              },
+              caption: info,
+              buttons: [
+                {
+                  buttonId: `${this.prefix}help`,
+                  buttonText: { displayText: "📋 Show Commands" },
+                  type: 1,
+                },
+                {
+                  buttonId: `${this.prefix}ping`,
+                  buttonText: { displayText: "🏓 Test Ping" },
+                  type: 1,
+                },
+              ],
+              headerType: 4,
+            },
+            {
+              quoted: messageInfo.raw,
+            }
+          );
+        } catch (err) {
+          console.log(err);
+          // Fallback to simple image message
+          await this.sock.sendMessage(
+            sender,
+            {
+              image: {
+                url: "./src/media/OblivinxLogo.png",
+              },
+              caption: info,
+            },
+            {
+              quoted: messageInfo.raw,
+            }
+          );
+        }
+      },
+    });
+
+    // Changelog command
+    obx.cmd({
+      name: "changelog",
+      description: "Show changelog",
+      usage: `${this.prefix}changelog`,
+      category: "owner",
+      isowner: true,
+      exec: async ({ reply }) => {
+        try {
+          const readfiles = await fs.readFile(
+            "./src/Data/Changelog.txt",
+            "utf-8"
+          );
+          let statsText = "📊 *Berikut adalah Changelog*\n\n" + readfiles;
+
+          await reply(statsText);
+        } catch (error) {
+          await reply("❌ Error reading changelog file");
+        }
+      },
+    });
+
+    // Stats command
+    obx.cmd({
+      name: "stats",
+      description: "Show command usage statistics",
+      usage: `${this.prefix}stats`,
+      category: "owner",
+      isowner: true,
+      exec: async ({ reply }) => {
+        const stats = this.getCommandStats();
+        let statsText = "📊 *Command Usage Statistics*\n\n";
+
+        if (Object.keys(stats).length === 0) {
+          statsText += "No command statistics available yet.";
+        } else {
+          Object.entries(stats)
+            .sort(([, a], [, b]) => b.executions - a.executions)
+            .forEach(([command, data]) => {
+              statsText += `*${command}*\n`;
+              statsText += `├─ Executions: ${data.executions}\n`;
+              statsText += `├─ Success: ${data.successes}\n`;
+              statsText += `├─ Failures: ${data.failures}\n`;
+              statsText += `└─ Avg Time: ${data.avgTime.toFixed(2)}ms\n\n`;
+            });
+        }
+
+        await reply(statsText);
+      },
+    });
+    obx.cmd({
+      name: "example",
+      exec: async ({ sock, messageInfo }) => {
+        await sock.sendMessage(messageInfo.sender, {
+          text: "Choose an option:",
+          buttons: [
+            {
+              buttonId: `${this.prefix}ping`,
+              buttonText: { displayText: "🏓 Ping" },
+              type: 1,
+            },
+            {
+              buttonId: `${this.prefix}info`,
+              buttonText: { displayText: "ℹ️ Info" },
+              type: 1,
+            },
+          ],
+          headerType: 1,
+        });
+      },
+    });
+  }
+
+  // Add custom command globally
+  addGlobalCommand(config) {
+    this.globalCommands.set(config.name, config);
+
+    // Add to existing instances
+    this.obxInstances.forEach((obx) => {
+      obx.cmd(config);
+    });
+
+    return this;
+  }
+
+  // Remove global command
+  removeGlobalCommand(name) {
+    this.globalCommands.delete(name);
+
+    // Remove from existing instances
+    this.obxInstances.forEach((obx) => {
+      obx.removeCommand(name);
+    });
+
+    return this;
+  }
+
+  // Clear all instances (useful for restarts)
+  clearInstances() {
+    this.obxInstances.clear();
+    return this;
+  }
+
+  // Check if message is button response
+  isButtonResponse(messageInfo) {
+    return !!(
+      messageInfo.raw?.message?.buttonsResponseMessage?.selectedButtonId ||
+      messageInfo.raw?.message?.listResponseMessage?.singleSelectReply
+        ?.selectedRowId
+    );
+  }
+
+  // Get response type
+  getResponseType(messageInfo) {
+    if (messageInfo.raw?.message?.buttonsResponseMessage) {
+      return "button";
+    }
+    if (messageInfo.raw?.message?.listResponseMessage) {
+      return "list";
+    }
+    return "text";
+  }
+
+  // Helper method to create button messages
+  createButtonMessage(text, buttons, options = {}) {
+    return {
+      text,
+      buttons: buttons.map((btn) => ({
+        buttonId: btn.id,
+        buttonText: { displayText: btn.text },
+        type: 1,
+      })),
+      headerType: 1,
+      ...options,
+    };
+  }
+
+  // Helper method to create list messages
+  createListMessage(text, title, buttonText, sections, options = {}) {
+    return {
+      text,
+      buttonText,
+      listType: 1,
+      sections: sections.map((section) => ({
+        title: section.title,
+        rows: section.rows.map((row) => ({
+          title: row.title,
+          description: row.description || "",
+          rowId: row.id,
+        })),
+      })),
+      ...options,
+    };
+  }
+}
+
+// Export classes
+export { Obx, MessageRegistry };

@@ -1,4 +1,4 @@
-import { downloadMediaMessage } from "@whiskeysockets/baileys";
+import { downloadMediaMessage } from "naruyaizumi";
 import { botLogger } from "../bot.js";
 import config from "../config.js";
 import FormData from "form-data";
@@ -10,6 +10,7 @@ import { YtDlp } from "../libs/ytdl-wrap.js";
 import { createHash } from "crypto";
 import fileManager from "../FileManagers/FileManager.js";
 import { writeExifImg, writeExifVid, writeExifWebp } from "../libs/exec.js";
+import { text } from "stream/consumers";
 const ytdl = new YtDlp();
 /**
  * global commands to the MessageRegistry
@@ -276,6 +277,7 @@ export default function (registry) {
     },
   });
 
+  // Perbaikan untuk command YTV yang lebih robust untuk button response
   registry.addGlobalCommand({
     name: "ytv",
     description: "Download video YouTube",
@@ -284,9 +286,53 @@ export default function (registry) {
     isowner: true,
     exec: async ({ sock, args, messageInfo, reply }) => {
       try {
-        const url = args[0];
+        // Enhanced argument parsing untuk button response
+        let url = args[0];
+
+        // Jika tidak ada args, coba ambil dari button data
+        if (
+          !url &&
+          messageInfo.isButtonResponse &&
+          messageInfo.buttonData?.buttonId
+        ) {
+          const buttonCommand = messageInfo.buttonData.buttonId;
+          console.log("🔘 Processing button command:", buttonCommand);
+
+          // Extract URL dari button command (format: ".ytv https://youtube.com/...")
+          const parts = buttonCommand.split(" ");
+          if (parts.length > 1) {
+            url = parts.slice(1).join(" "); // Join kembali jika URL ada spasi
+          }
+        }
+
         if (!url) {
           return await reply("❗ Masukkan URL YouTube! Contoh: !ytv <url>");
+        }
+
+        // Log untuk debugging
+        console.log("🎥 YTV Command executed:");
+        console.log("- URL:", url);
+        console.log("- Is Button Response:", messageInfo.isButtonResponse);
+        console.log("- Button Data:", messageInfo.buttonData);
+
+        // Validasi URL YouTube
+        const youtubeRegex =
+          /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\/.+/;
+        if (!youtubeRegex.test(url)) {
+          return await reply(
+            "❌ URL tidak valid! Masukkan URL YouTube yang benar."
+          );
+        }
+
+        // Kirim feedback immediate untuk button response
+        if (messageInfo.isButtonResponse) {
+          await reply(
+            `🎬 Memproses download video dari button: "${
+              messageInfo.buttonData?.displayText || "Video Download"
+            }"\n📹 URL: ${url}\n⏳ Mohon tunggu...`
+          );
+        } else {
+          await reply("⏳ Memproses download video, mohon tunggu...");
         }
 
         // Hash URL → nama unik
@@ -317,6 +363,7 @@ export default function (registry) {
           title: videoInfo.title,
           duration: videoInfo.duration,
           ext: videoInfo.ext,
+          playlist: videoInfo.playlist,
         });
 
         // ✅ STEP 2: List files before download untuk comparison
@@ -356,7 +403,7 @@ export default function (registry) {
         const filesAfterThumbs = fs
           .readdirSync(outputDirthumbnail)
           .filter((f) => f.startsWith(fileNameBase));
-        console.log("📂 Files after download:", filesAfter);
+        console.log("🖼️ Thumbnails after download:", filesAfterThumbs);
 
         // Find the new file(s)
         const newFiles = filesAfter.filter((f) => !filesBefore.includes(f));
@@ -365,7 +412,7 @@ export default function (registry) {
         const newFilesThumbs = filesAfterThumbs.filter(
           (f) => !filesBeforeThumbs.includes(f)
         );
-        console.log("🆕 New files found:", newFilesThumbs);
+        console.log("🆕 New thumbnail files found:", newFilesThumbs);
 
         if (newFiles.length === 0) {
           // Fallback: look for any file that matches pattern
@@ -403,13 +450,10 @@ export default function (registry) {
           console.error("Directory contents:", fs.readdirSync(outputDir));
           throw new Error(`File tidak ditemukan: ${downloadedPath}`);
         }
+
         let thumbnailFile = newFilesThumbs.find((f) =>
           /\.(jpe?g|png|webp)$/i.test(f)
         );
-
-        // if (!thumbnailFile) {
-        //   throw new Error("Thumbnail tidak ditemukan setelah download");
-        // }
 
         const downloadedPathThumbs = path.join(
           outputDirthumbnail,
@@ -418,10 +462,11 @@ export default function (registry) {
 
         // Pastikan file thumbnail ada
         if (!fs.existsSync(downloadedPathThumbs)) {
-          throw new Error("Thumbnail tidak ditemukan");
+          console.warn(
+            "⚠️ Thumbnail tidak ditemukan, melanjutkan tanpa thumbnail"
+          );
         }
 
-        const jpegThumbnail = fs.readFileSync(downloadedPathThumbs);
         const fileStats = fs.statSync(downloadedPath);
         console.log("📊 File stats:", {
           size: `${(fileStats.size / 1024 / 1024).toFixed(2)} MB`,
@@ -440,80 +485,66 @@ export default function (registry) {
         // ✅ STEP 7: Format caption
         const formattedDuration = formatDuration(fileInfo.duration);
 
-        const names = messageInfo.raw.pushName;
-        const caption = ` Hi ${names} Ini videomu
+        const names = messageInfo.raw.pushName || "User";
 
-🎬 *Judul:* ${fileInfo.title}
+        // Enhanced caption untuk button response
+        let caption;
+        if (messageInfo.isButtonResponse) {
+          caption = `🎬 *Video Download Selesai!* 
+
+👋 Hai! ${names}
+🔘 Button: ${messageInfo.buttonData?.displayText || "Download Video"}
+
+📝 *Judul:* ${fileInfo.title}
 📽️ *Kualitas:* ${fileInfo.format_note}
 ⏱️ *Durasi:* ${formattedDuration}
 📦 *Ukuran:* ${fileInfo.fileSize}
 
 > By Natz6N ~ Oblivinx Bot
-`;
+> Download via Button Response ✅`;
+        } else {
+          caption = `👋 Hai! ${names}
+
+📝 *Judul:* ${fileInfo.title}
+📽️ *Kualitas:* ${fileInfo.format_note}
+⏱️ *Durasi:* ${formattedDuration}
+📦 *Ukuran:* ${fileInfo.fileSize}
+
+> By Natz6N ~ Oblivinx Bot`;
+        }
+
         console.log("📝 Caption:", caption);
 
         // ✅ STEP 8: Send video
         console.log("📤 Sending video...");
-        const { key, message } = await sock.sendMessage(
-          messageInfo.sender,
-          {
-            document: fs.readFileSync(downloadedPath), // buffer video
-            caption,
-            mimetype: "video/mp4",
-            jpegThumbnail,
-            fileLength: fileStats.size,
-            footer: "By Oblivinx Bot",
-            headerType: 4,
-            contextInfo: {
-              externalAdReply: {
-                title: fileInfo.title,
-                body: "Klik untuk nonton di YouTube",
-                mediaType: 2,
-                thumbnail: jpegThumbnail,
-                mediaUrl: url,
-                sourceUrl: url,
-              },
-            },
-          },
-          { quoted: messageInfo.raw }
-        );
+        const playlistInfo = videoInfo.playlist || null;
+        console.log("📋 Playlist info:", playlistInfo);
 
-        // ✅ Pesan kedua: tombol saja
-        // ✅ Pesan kedua: tombol saja (fixed)
+        await sock.sendMessage(messageInfo.sender, {
+          text: `📤 Sedang mengirim video... Mohon bersabar!`,
+        });
+
         await sock.sendMessage(
           messageInfo.sender,
           {
-            text: "📌 Pilih menu lanjutan:",
-            footer: "By Oblivinx Bot",
-            buttons: [
-              {
-                buttonId: `${registry.prefix}help`,
-                buttonText: { displayText: "📖 Help" },
-                type: 1,
-              },
-              {
-                buttonId: `${registry.prefix}menu`,
-                buttonText: { displayText: "📂 Menu" },
-                type: 1,
-              },
-            ],
+            video: fs.readFileSync(downloadedPath),
+            caption,
+            mimetype: "video/mp4",
+            fileLength: fileStats.size,
           },
-          {
-            quoted: {
-              key,
-              message,
-            },
-          }
+          { quoted: messageInfo.raw }
         );
         console.log("✅ Video sent successfully");
 
         // ✅ STEP 9: Cleanup - delete file after sending
         try {
           await fileManager.deleteFile(downloadedPath);
-          await fileManager.deleteFile(downloadedPathThumbs);
-          console.log("🗑️ File deleted successfully");
+          if (fs.existsSync(downloadedPathThumbs)) {
+            await fileManager.deleteFile(downloadedPathThumbs);
+          }
+          console.log("🗑️ Files cleaned up successfully");
         } catch (deleteError) {
-          console.warn("⚠️ Failed to delete file:", deleteError.message);
+          console.warn("⚠️ Failed to delete files:", deleteError.message);
         }
       } catch (error) {
         console.error("❌ YTV Command Error:");
@@ -525,17 +556,262 @@ export default function (registry) {
         // Enhanced error message
         let errorMessage = "❌ Terjadi kesalahan saat download video.";
 
+        if (messageInfo.isButtonResponse) {
+          errorMessage = `❌ Gagal download video dari button "${
+            messageInfo.buttonData?.displayText || "Video Download"
+          }"`;
+        }
+
         if (error.message.includes("not found")) {
           errorMessage += "\n🔍 File tidak ditemukan setelah download.";
         } else if (error.message.includes("Failed to get")) {
           errorMessage += "\n🌐 Gagal mendapatkan informasi video.";
         } else if (error.message.includes("yt-dlp failed")) {
           errorMessage += "\n⚙️ Proses download gagal.";
+        } else if (error.message.includes("tidak valid")) {
+          errorMessage += "\n🔗 URL YouTube tidak valid.";
         }
 
         errorMessage += `\n\n📝 Detail: ${error.message}`;
 
         await reply(errorMessage);
+      }
+    },
+  });
+  /* 
+  Youtube To Audio
+  */
+  registry.addGlobalCommand({
+    name: "yta",
+    description: "Download audio YouTube",
+    usage: `${registry.prefix}yta <url>`,
+    category: "utils",
+    isowner: true,
+    exec: async ({ sock, args, messageInfo, reply }) => {
+      try {
+        const url = args[0];
+        // Jika tidak ada args, coba ambil dari button data
+        if (
+          !url &&
+          messageInfo.isButtonResponse &&
+          messageInfo.buttonData?.buttonId
+        ) {
+          const buttonCommand = messageInfo.buttonData.buttonId;
+          console.log("🔘 Processing button command:", buttonCommand);
+
+          // Extract URL dari button command (format: ".ytv https://youtube.com/...")
+          const parts = buttonCommand.split(" ");
+          if (parts.length > 1) {
+            url = parts.slice(1).join(" "); // Join kembali jika URL ada spasi
+          }
+        }
+        if (!url) {
+          return await reply("❗ Masukkan URL YouTube! Contoh: !yta <url>");
+        }
+
+        const hash = createHash("sha256")
+          .update(url)
+          .digest("hex")
+          .slice(0, 10);
+        const fileNameBase = `yta_Oblivinx__${hash}`;
+        const fileTemplate = `${fileNameBase}__%(id)s.%(ext)s`;
+
+        const outputDir = fileManager.getDirectoryPath("audio");
+
+        fs.mkdirSync(outputDir, { recursive: true });
+
+        // Ambil info video
+        const videoInfo = await ytdl.getInfo(url);
+
+        // Simpan file sebelum download
+        const filesBefore = fs.existsSync(outputDir)
+          ? fs.readdirSync(outputDir).filter((f) => f.startsWith(fileNameBase))
+          : [];
+
+        // Mulai download audio
+        const downloadResult = await ytdl.downloadAudio(url, {
+          outputDir,
+          outputTemplate: fileTemplate,
+          onProgress: (p) => console.log("📊 Audio Progress:", p.trim()),
+        });
+
+        console.log(downloadResult);
+        const filesAfter = fs
+          .readdirSync(outputDir)
+          .filter((f) => f.startsWith(fileNameBase));
+        console.log("📂 Files after download:", filesAfter);
+
+        const newFiles = filesAfter.filter((f) => !filesBefore.includes(f));
+        console.log("🆕 New files found:", newFiles);
+
+        if (newFiles.length === 0)
+          throw new Error("❌ Audio tidak ditemukan setelah proses download");
+
+        let downloadedFileName = newFiles[0];
+        if (newFiles.length > 1) {
+          const audio = newFiles.filter((f) =>
+            /\.(mp3|wav|ogg|flac|aac|m4a)$/i.test(f)
+          );
+          if (audio.length > 0) {
+            downloadedFileName = audio[0];
+          }
+        }
+        const downloadedPath = path.join(outputDir, downloadedFileName);
+
+        if (!fs.existsSync(downloadedPath))
+          throw new Error(`❌ File tidak ditemukan: ${downloadedPath}`);
+
+        const fileStats = fs.statSync(downloadedPath);
+        const fileInfo = {
+          title: videoInfo.title,
+          duration: formatDuration(videoInfo.duration),
+          size: `${(fileStats.size / 1024 / 1024).toFixed(2)} MB`,
+          fileName: downloadedFileName,
+        };
+
+        const names = messageInfo.raw.pushName;
+        const caption = `🎧 *Audio Downloader* by Oblivinx
+
+👤 Nama: *${names}*
+🎵 Judul: *${fileInfo.title}*
+⏱️ Durasi: *${fileInfo.duration}*
+📦 Ukuran: *${fileInfo.size}*
+
+🔗 ${url}
+`;
+        // 1. Kirim audionya dulu
+        const { key, message } = await sock.sendMessage(
+          messageInfo.sender,
+          {
+            audio: fs.readFileSync(downloadedPath),
+            mimetype: "audio/mp4",
+            ptt: false,
+          },
+          { quoted: messageInfo.raw }
+        );
+
+        // 2. Kirim caption-nya terpisah
+        await sock.sendMessage(
+          messageInfo.sender,
+          { text: caption },
+          {
+            quoted: {
+              message,
+              key,
+            },
+          }
+        );
+
+        // Cleanup
+        await fileManager.deleteFile(downloadedPath);
+        console.log("🧹 Audio dan thumbnail dibersihkan.");
+      } catch (error) {
+        console.error("❌ Error YTA:", error.message);
+        await reply(`❌ Terjadi kesalahan:\n${error.message}`);
+      }
+    },
+  });
+  registry.addGlobalCommand({
+    name: "ytinfo",
+    description: "Lihat informasi video YouTube dan pilih unduhan",
+    usage: `${registry.prefix}ytinfo <url>`,
+    category: "utils",
+    isowner: true,
+    exec: async ({ sock, args, messageInfo, reply }) => {
+      try {
+        const url = args[0];
+        // Jika tidak ada args, coba ambil dari button data
+        if (
+          !url &&
+          messageInfo.isButtonResponse &&
+          messageInfo.buttonData?.buttonId
+        ) {
+          const buttonCommand = messageInfo.buttonData.buttonId;
+          console.log("🔘 Processing button command:", buttonCommand);
+
+          // Extract URL dari button command (format: ".ytv https://youtube.com/...")
+          const parts = buttonCommand.split(" ");
+          if (parts.length > 1) {
+            url = parts.slice(1).join(" "); // Join kembali jika URL ada spasi
+          }
+        }
+        if (!url) {
+          return await reply("❗ Masukkan URL YouTube!\nContoh: !ytinfo <url>");
+        }
+
+        // Ambil info video
+        const videoInfo = await ytdl.getInfo(url);
+        // Destructure info dengan fallback
+        const {
+          uploader_id,
+          uploader_url,
+          like_count,
+          description,
+          fulltitle,
+          channel_is_verified,
+          subtitles,
+          comment_count,
+          categories,
+          tags,
+          availability,
+          duration_string,
+        } = videoInfo;
+
+        const caption = `🎧 *YouTube Info* by Oblivinx
+
+📝 *Judul:* ${fulltitle}
+👤 *Channel:* ${uploader_id || "Tidak diketahui"} ${
+          channel_is_verified ? "✅ Terverifikasi" : ""
+        }
+🔗 *Channel URL:* ${uploader_url || "-"}
+👍 *Likes:* ${like_count ?? "Tidak diketahui"}
+💬 *Komentar:* ${comment_count ?? "Tidak diketahui"}
+🎬 *Durasi:* ${duration_string ?? "-"}
+🏷️ *Kategori:* ${(categories || []).join(", ") || "-"}
+🏷️ *Tags:* ${(tags || []).slice(0, 5).join(", ") || "-"}
+🌍 *Ketersediaan:* ${availability || "-"}
+
+🧾 *Deskripsi:*
+${description?.slice(0, 300) || "Tidak ada deskripsi..."}`;
+
+        // Kirim caption + tombol
+        const {message} = await sock.sendMessage(
+          messageInfo.sender,
+          {
+            text: caption,
+            footer: "🎬 Pilih opsi unduhan di bawah",
+            buttons: [
+              {
+                buttonId: `${registry.prefix}yta ${url}`,
+                buttonText: { displayText: "🎵 Download Audio" },
+                type: 1,
+              },
+              {
+                buttonId: `${registry.prefix}ytv ${url}`,
+                buttonText: { displayText: "📽️ Download Video" },
+                type: 1,
+              },
+              {
+                buttonId: `${registry.prefix}ytpl ${url}`,
+                buttonText: { displayText: "📺 Lihat Playlist" },
+                type: 1,
+              },
+              {
+                buttonId: `${registry.prefix}joinwa`,
+                buttonText: { displayText: "👥 Join Grup WA" },
+                type: 1,
+              },
+            ],
+            headerType: 1,
+          },
+          { quoted: messageInfo.raw }
+        );
+        console.log(message)
+      } catch (error) {
+        console.error("❌ Error YTINFO:", error);
+        await reply(
+          `❌ Terjadi kesalahan saat mengambil informasi:\n${error.message}`
+        );
       }
     },
   });

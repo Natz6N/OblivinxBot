@@ -4,9 +4,9 @@ import {
   useMultiFileAuthState,
   DisconnectReason,
   isJidNewsletter,
-} from "@whiskeysockets/baileys";
+} from "naruyaizumi";
 import Pino from "pino";
-import qrcode from "qrcode-terminal";
+import qrcode from "qrcode-terminal"
 import * as Boom from "@hapi/boom";
 import { MessageRegistry } from "./Clients/RegistryCommands.js";
 import {
@@ -17,10 +17,13 @@ import {
 import os from "os";
 import { setupAntiCall } from "./Clients/Settings/antiCall.js";
 import config from "./config.js";
-import dayjs from "dayjs"; // opsional, untuk format waktu
+import dayjs from "dayjs";
 
 const groupCache = new Map();
 let pairingCodeRequested = false;
+let globalQueue = null;
+let reconnectAttempts = 0;
+const MAX_RECONNECT_ATTEMPTS = 5;
 
 // Create logger
 export const botLogger = Pino({
@@ -37,43 +40,69 @@ export default async function initBot(queue) {
   try {
     const chalk = await import("chalk").then((m) => m.default);
 
+    // Store queue reference globally for reconnection
+    if (queue) {
+      globalQueue = queue;
+    }
+
+    // Use global queue if no queue parameter provided (during reconnection)
+    const currentQueue = queue || globalQueue;
+
+    if (!currentQueue) {
+      throw new Error("Queue is required for bot initialization");
+    }
+
     const { state, saveCreds } = await useMultiFileAuthState("__oblivinx_auth");
 
     const sock = makeWASocket({
       auth: state,
       printQRInTerminal: true,
       logger: Pino({ level: "silent" }),
-      browser: ["Oblivinx Bot", "Chrome", "1.0.0"],
+      browser: ["OblivinxBot", "Chrome", "110.0.5481.77"],
       cachedGroupMetadata: async (jid) => groupCache.get(jid),
+      // Add these connection options to improve stability
+      connectTimeoutMs: 60000,
+      defaultQueryTimeoutMs: 60000,
+      keepAliveIntervalMs: 10000,
+      markOnlineOnConnect: true,
+      syncFullHistory: false,
+      // Add user agent and other headers
+      options: {
+        headers: {
+          'User-Agent': 'WhatsApp/2.23.24.76 Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36'
+        }
+      }
     });
 
     const registry = new MessageRegistry(sock, botLogger);
     const owners = config.ownerDB.get("owners", []) || [];
     registry.setPrefix(config.prefix).setOwners(owners);
-    queue.setDefaultHandler(processMessageFromQueue);
+
+    currentQueue.setDefaultHandler(processMessageFromQueue);
 
     // Handle credentials update
     sock.ev.on("creds.update", saveCreds);
     setupAntiCall(sock, config.callDB, botLogger);
-    // Handle group updates
+
+    // Handle group updates with error handling
     sock.ev.on("groups.update", async (events) => {
       for (const event of events) {
         try {
           const metadata = await sock.groupMetadata(event.id);
           groupCache.set(event.id, metadata);
         } catch (error) {
-          botLogger.error("Error updating group metadata:", error);
+          botLogger.error(`Error updating group metadata for ${event.id}:`, error);
         }
       }
     });
 
-    // Handle group participants update
+    // Handle group participants update with error handling
     sock.ev.on("group-participants.update", async (event) => {
       try {
         const metadata = await sock.groupMetadata(event.id);
         groupCache.set(event.id, metadata);
       } catch (error) {
-        botLogger.error("Error updating group participants:", error);
+        botLogger.error(`Error updating group participants for ${event.id}:`, error);
       }
     });
 
@@ -83,7 +112,7 @@ export default async function initBot(queue) {
       registry,
       botLogger,
       groupCache,
-      queue,
+      currentQueue
     );
 
     sock.ev.on("messages.upsert", messageHandler);
@@ -91,19 +120,16 @@ export default async function initBot(queue) {
     // Handle connection updates
     sock.ev.on("connection.update", async (update) => {
       const { connection, lastDisconnect, qr } = update;
-
-      // Handle QR code
+      // Handle QR code - FIXED LOGIC
       if (qr) {
         console.log("QR RECEIVED");
-        qrcode.generate(qr, { small: true });
+        qrcode.generate(qr, {small:true})
 
         // Pairing code example (disabled by default)
         const pairingCodeEnabled = false;
         if (pairingCodeEnabled && !pairingCodeRequested) {
           try {
-            const pairingCode = await sock.requestPairingCode(
-              prompt("Please enter your name:")
-            );
+            const pairingCode = await sock.requestPairingCode("87793482662");
             console.log("Pairing code enabled, code: " + pairingCode);
             pairingCodeRequested = true;
           } catch (error) {
@@ -116,28 +142,66 @@ export default async function initBot(queue) {
       if (connection === "close") {
         const shouldReconnect =
           lastDisconnect?.error instanceof Boom.Boom &&
-          lastDisconnect.error.output?.statusCode !==
-            DisconnectReason.loggedOut;
+          lastDisconnect.error.output?.statusCode !== DisconnectReason.loggedOut;
 
-        if (shouldReconnect) {
-          console.log("Connection closed, reconnecting...");
-          await delay(2000);
-          await initBot();
-        } else {
+        console.log("Connection closed:", lastDisconnect?.error?.message || "Unknown error");
+        
+        // Handle specific error codes
+        const statusCode = lastDisconnect?.error?.output?.statusCode;
+        
+        if (statusCode === 405) {
+          console.log("Method Not Allowed error - clearing session and restarting...");
+          // Clear auth session for 405 errors
+          try {
+            const fs = await import('fs');
+            if (fs.existsSync('__oblivinx_auth')) {
+              fs.rmSync('__oblivinx_auth', { recursive: true, force: true });
+              console.log("Auth session cleared");
+            }
+          } catch (error) {
+            console.error("Error clearing auth session:", error);
+          }
+          pairingCodeRequested = false;
+          reconnectAttempts = 0;
+        }
+
+        if (shouldReconnect && reconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
+          reconnectAttempts++;
+          console.log(`Reconnection attempt ${reconnectAttempts}/${MAX_RECONNECT_ATTEMPTS}...`);
+          
+          // Exponential backoff delay
+          const delayMs = Math.min(2000 * Math.pow(2, reconnectAttempts - 1), 30000);
+          console.log(`Waiting ${delayMs}ms before reconnecting...`);
+          
+          await delay(delayMs);
+          
+          try {
+            await initBot();
+          } catch (error) {
+            console.error("Error during reconnection:", error);
+          }
+        } else if (statusCode === DisconnectReason.loggedOut) {
           console.log("Connection logged out. Please scan QR again.");
+          reconnectAttempts = 0;
+          pairingCodeRequested = false;
+        } else if (reconnectAttempts >= MAX_RECONNECT_ATTEMPTS) {
+          console.log("Max reconnection attempts reached. Please restart the bot manually.");
+          reconnectAttempts = 0;
         }
       } else if (connection === "open") {
         console.log("");
         console.log("✅ Bot connected successfully!");
         botLogger.info("Bot is ready to receive messages!");
+        reconnectAttempts = 0; // Reset on successful connection
+        
         console.clear();
         console.log(`
   ____  _     _ _        _          ____        _   
- / __ \| |   | (_)      (_)        |  _ \      | |  
+ / __ \\| |   | (_)      (_)        |  _ \\      | |  
 | |  | | |__ | |___  ___ _ _ __  __| |_) | ___ | |_ 
-| |  | | '_ \| | \ \/ / | | '_ \/ __|  _ < / _ \| __|
-| |__| | |_) | | |>  <| | | | | \__ \ |_) | (_) | |_ 
- \____/|_.__/|_|_/_/\_\_|_|_| |_|___/____/ \___/ \__|
+| |  | | '_ \\| | \\ \\/ / | | '_ \\/ __|  _ < / _ \\| __|
+| |__| | |_) | | |>  <| | | | | \\__ \\ |_) | (_) | |_ 
+ \\____/|_.__/|_|_/_/\\_\\_|_|_| |_|___/____/ \\___/ \\__|
                                                     
 ====================================================== 
     Versi: ${config.Botinfo.version}          Dibuat oleh: Natz6N
@@ -176,9 +240,9 @@ export default async function initBot(queue) {
             os.totalmem() / 1024 / 1024
           )} MB`
         );
-        console.log(`${chalk.cyan(" Owner         :")} ${owners}`);
+        console.log(`${chalk.cyan("👑 Owner       :")} ${owners.join(', ')}`);
         console.log(
-          chalk.green.bold("\n🔥 Trimakasih sudah menggunakan bot ini!")
+          chalk.green.bold("\n🔥 Terima kasih sudah menggunakan bot ini!")
         );
         console.log(chalk.green.bold("📣 Jangan lupa support terus ya 💖"));
         console.log(
@@ -192,6 +256,15 @@ export default async function initBot(queue) {
     return sock;
   } catch (error) {
     botLogger.error("Error initializing bot:", error);
+    
+    // If initialization fails, increment reconnect attempts
+    if (reconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
+      reconnectAttempts++;
+      console.log(`Initialization failed, retrying... (${reconnectAttempts}/${MAX_RECONNECT_ATTEMPTS})`);
+      await delay(5000);
+      return await initBot(queue);
+    }
+    
     throw error;
   }
 }

@@ -47,13 +47,7 @@ queue.setDefaultHandler(async (msg) => {
 // 3. Jalankan bot dan pass queue-nya
 (async () => {
   await config.initDatabases();
-  process.on("uncaughtException", (err) => {
-    console.error("[UNCAUGHT EXCEPTION]", err.stack || err);
-  });
-
-  process.on("unhandledRejection", (reason) => {
-    console.error("[UNHANDLED REJECTION]", reason.stack || reason);
-  });
+  console.log("DEBUG: Apakah queue valid?", typeof queue, !!queue);
   setInterval(() => fileManager.cleanTempFiles(), 10 * 60 * 1000);
   await initBot(queue); // kirim queue ke dalam bot.js
 })();

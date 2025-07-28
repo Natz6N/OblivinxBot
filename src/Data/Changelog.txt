@@ -25,4 +25,9 @@
 
 # *Version 0.0.5*
 
->
+> Buat library downloader Youtube (Bug download yt-dlp)
+> benerin queue msg Bug
+
+# *Version 0.0.6*
+
+> fix bug library downloader Youtube 
