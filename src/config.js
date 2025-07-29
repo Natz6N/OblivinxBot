@@ -68,7 +68,6 @@ const ownerDB = new JSONManager({
 const isOwner = async (number) => {
   const cleanNumber = number.replace(/[^0-9]/g, "");
   const owners = ownerDB.get("owners", []);
-
   return owners.includes(cleanNumber);
 };
 
@@ -84,7 +83,7 @@ const isBlocked = async (number) => {
   return callData.blocked || false;
 };
 const initDatabases = async () => {
-  await Promise.all([callDB.init(), userDB.init(), ownerDB.init()]);
+  await Promise.all([callDB.init(), userDB.init(), ownerDB.init(), group.init()]);
 };
 
 // Global export

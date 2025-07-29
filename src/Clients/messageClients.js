@@ -1,10 +1,11 @@
 import { isJidNewsletter, downloadMediaMessage } from "naruyaizumi";
 import { readdirSync } from "fs";
-import { join, dirname } from "path";
+import path, { join, dirname } from "path";
 import { fileURLToPath } from "url";
+import fs from "fs/promises";
+import config from "../config.js";
 import fileManager from "../FileManagers/FileManager.js";
 import { botLogger } from "../bot.js";
-
 // Get current directory for ES modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -32,6 +33,18 @@ const MESSAGE_TYPES = {
   POLL_UPDATE: "pollUpdateMessage",
   MESSAGE_CONTEXT_INFO: "messageContextInfo",
 };
+const BOT_INFO_PATH = path.join("./src/Data/BotInfo.json");
+
+// Fungsi untuk ambil status bot
+async function getBotStatus() {
+  try {
+    const data = await fs.readFile(BOT_INFO_PATH, "utf-8");
+    return JSON.parse(data);
+  } catch (err) {
+    console.error("Gagal membaca botinfo.json:", err);
+    return { status: "on", alasan: "" }; // default jika gagal baca
+  }
+}
 
 const MEDIA_TYPES = [
   MESSAGE_TYPES.IMAGE,
@@ -48,10 +61,61 @@ const BUTTON_RESPONSE_TYPES = [
   MESSAGE_TYPES.POLL_UPDATE,
 ];
 
-const TEXT_MESSAGE_TYPES = [
-  MESSAGE_TYPES.TEXT,
-  MESSAGE_TYPES.EXTENDED_TEXT,
-];
+const TEXT_MESSAGE_TYPES = [MESSAGE_TYPES.TEXT, MESSAGE_TYPES.EXTENDED_TEXT];
+async function handleMessage(sock, sender, messageContent, registry) {
+  try {
+    const botInfo = await getBotStatus();
+    const isOwner = await config.isOwner(sender);
+    const text = messageContent.text || "";
+    const isCommand = text.startsWith(registry.prefix);
+
+    if (
+      ["off", "maintenance"].includes(botInfo.status?.toLowerCase()) &&
+      !isOwner &&
+      isCommand
+    ) {
+      await sock.sendMessage(sender, {
+        text: `Hi, bot sedang *${botInfo.alasan || "tidak aktif"}*.`,
+        title: "👋 Hai!",
+        subtitle: "🌼 Subjudul di sini",
+        footer: "📩 Dikirim oleh Naruya Izumi",
+        interactiveButtons: [
+          {
+            name: "cta_url",
+            buttonParamsJson: JSON.stringify({
+              display_text: "🌐 Kunjungi Channel",
+              url: "https://whatsapp.com/channel/0029Vag9VSI2ZjCocqa2lB1y",
+              merchant_url:
+                "https://whatsapp.com/channel/0029Vag9VSI2ZjCocqa2lB1y",
+            }),
+          },
+          {
+            name: "cta_url",
+            buttonParamsJson: JSON.stringify({
+              display_text: "🌐 Kunjungi Channel",
+              url: "https://whatsapp.com/channel/0029Vag9VSI2ZjCocqa2lB1y",
+              merchant_url:
+                "https://whatsapp.com/channel/0029Vag9VSI2ZjCocqa2lB1y",
+            }),
+          },
+          {
+            name: "cta_call",
+            buttonParamsJson: JSON.stringify({
+              display_text: "📞 Telepon Saya",
+              phone_number: "628xxxx",
+            }),
+          },
+        ],
+      });
+
+      return true; // ✅ hentikan eksekusi fitur lain
+    }
+
+    return false; // ✅ lanjutkan ke fitur berikutnya
+  } catch (error) {
+    console.log(error);
+  }
+}
 
 /**
  * Enhanced function to extract button response data
@@ -73,18 +137,22 @@ function extractButtonResponse(message) {
   switch (messageType) {
     case MESSAGE_TYPES.BUTTONS_RESPONSE:
       // Handle different possible structures for buttonsResponseMessage
-      buttonId = messageData.selectedButtonId || 
-                 messageData.selectedButton?.buttonId || 
-                 messageData.selectedButton?.id || 
-                 messageData.button?.buttonId || 
-                 messageData.button?.id || 
-                 messageData.buttonId || 
-                 messageData.id || "";
+      buttonId =
+        messageData.selectedButtonId ||
+        messageData.selectedButton?.buttonId ||
+        messageData.selectedButton?.id ||
+        messageData.button?.buttonId ||
+        messageData.button?.id ||
+        messageData.buttonId ||
+        messageData.id ||
+        "";
 
-      displayText = messageData.selectedButton?.displayText || 
-                   messageData.button?.displayText || 
-                   messageData.displayText || 
-                   messageData.text || "";
+      displayText =
+        messageData.selectedButton?.displayText ||
+        messageData.button?.displayText ||
+        messageData.displayText ||
+        messageData.text ||
+        "";
       responseType = "button";
       break;
 
@@ -126,9 +194,13 @@ function extractTextContent(message) {
   if (!message) return "";
 
   // Priority 1: Check for button responses first
-  const buttonResponseType = BUTTON_RESPONSE_TYPES.find(type => message[type]);
+  const buttonResponseType = BUTTON_RESPONSE_TYPES.find(
+    (type) => message[type]
+  );
   if (buttonResponseType) {
-    const buttonResponse = extractButtonResponse({ [buttonResponseType]: message[buttonResponseType] });
+    const buttonResponse = extractButtonResponse({
+      [buttonResponseType]: message[buttonResponseType],
+    });
     if (buttonResponse.buttonId) {
       return buttonResponse.buttonId;
     }
@@ -148,9 +220,12 @@ function extractTextContent(message) {
 
   // Priority 3: Check for media with captions
   const mediaTypes = [
-    'imageMessage', 'videoMessage', 'documentMessage', 'audioMessage'
+    "imageMessage",
+    "videoMessage",
+    "documentMessage",
+    "audioMessage",
   ];
-  
+
   for (const mediaType of mediaTypes) {
     if (message[mediaType]?.caption) {
       return message[mediaType].caption;
@@ -158,10 +233,11 @@ function extractTextContent(message) {
   }
 
   // Priority 4: Check for quoted messages
-  const contextInfo = message.extendedTextMessage?.contextInfo || 
-                     message.imageMessage?.contextInfo || 
-                     message.videoMessage?.contextInfo;
-  
+  const contextInfo =
+    message.extendedTextMessage?.contextInfo ||
+    message.imageMessage?.contextInfo ||
+    message.videoMessage?.contextInfo;
+
   if (contextInfo?.quotedMessage) {
     const quotedText = extractTextContent(contextInfo.quotedMessage);
     if (quotedText) return quotedText;
@@ -179,27 +255,29 @@ async function extractMessageContent(msg) {
   try {
     const message = msg.message;
     if (!message) {
-      return { 
-        text: "", 
-        type: "unknown", 
-        hasMedia: false, 
+      return {
+        text: "",
+        type: "unknown",
+        hasMedia: false,
         isValid: false,
         isButtonResponse: false,
         buttonData: null,
         isContextInfo: false,
-        isMixedMessage: false
+        isMixedMessage: false,
       };
     }
 
     const messageTypes = Object.keys(message);
-    
+
     // Detect mixed messages (multiple message types in one object)
     const isMixedMessage = messageTypes.length > 1;
-    
+
     // Check if this is only messageContextInfo (metadata only)
-    const isContextInfo = messageTypes.includes(MESSAGE_TYPES.MESSAGE_CONTEXT_INFO);
+    const isContextInfo = messageTypes.includes(
+      MESSAGE_TYPES.MESSAGE_CONTEXT_INFO
+    );
     const isOnlyContextInfo = messageTypes.length === 1 && isContextInfo;
-    
+
     // Priority: Check for button responses first
     let primaryType = "";
     let isButtonResponse = false;
@@ -237,7 +315,10 @@ async function extractMessageContent(msg) {
 
     // Final fallback - use first available type
     if (!primaryType && messageTypes.length > 0) {
-      primaryType = messageTypes.find(type => type !== MESSAGE_TYPES.MESSAGE_CONTEXT_INFO) || messageTypes[0];
+      primaryType =
+        messageTypes.find(
+          (type) => type !== MESSAGE_TYPES.MESSAGE_CONTEXT_INFO
+        ) || messageTypes[0];
     }
 
     // Extract text content
@@ -249,16 +330,17 @@ async function extractMessageContent(msg) {
     }
 
     const hasMedia = MEDIA_TYPES.includes(primaryType);
-    
+
     // Consider message valid if:
     // 1. Has text content
     // 2. Has media content
     // 3. Is a button response with buttonId
     // 4. Is NOT just messageContextInfo
-    const isValid = (text.length > 0) || 
-                   hasMedia || 
-                   (isButtonResponse && buttonData?.buttonId) ||
-                   (!isOnlyContextInfo && messageTypes.length > 0);
+    const isValid =
+      text.length > 0 ||
+      hasMedia ||
+      (isButtonResponse && buttonData?.buttonId) ||
+      (!isOnlyContextInfo && messageTypes.length > 0);
 
     return {
       text,
@@ -275,16 +357,16 @@ async function extractMessageContent(msg) {
     };
   } catch (error) {
     console.error("Error extracting message content:", error);
-    return { 
-      text: "", 
-      type: "unknown", 
-      hasMedia: false, 
+    return {
+      text: "",
+      type: "unknown",
+      hasMedia: false,
       isValid: false,
       isButtonResponse: false,
       buttonData: null,
       isContextInfo: false,
       isMixedMessage: false,
-      isOnlyContextInfo: false
+      isOnlyContextInfo: false,
     };
   }
 }
@@ -354,7 +436,10 @@ async function getGroupMetadata(groupJid, sock, groupCache, botLogger) {
 
     return groupMetadata;
   } catch (error) {
-    botLogger.warn(`Failed to get group metadata for ${groupJid}:`, error.message);
+    botLogger.warn(
+      `Failed to get group metadata for ${groupJid}:`,
+      error.message
+    );
     return null;
   }
 }
@@ -365,7 +450,9 @@ async function getGroupMetadata(groupJid, sock, groupCache, botLogger) {
 function isUserAdmin(participantId, groupMetadata) {
   if (!groupMetadata || !participantId) return false;
 
-  const participant = groupMetadata.participants.find((p) => p.id === participantId);
+  const participant = groupMetadata.participants.find(
+    (p) => p.id === participantId
+  );
   return participant?.admin === "admin" || participant?.admin === "superadmin";
 }
 
@@ -388,10 +475,16 @@ async function loadCommands(registry, botLogger) {
           const commandPath = join(commandsPath, file);
           const commandModule = await import(`file://${commandPath}`);
 
-          if (commandModule.default && typeof commandModule.default === "function") {
+          if (
+            commandModule.default &&
+            typeof commandModule.default === "function"
+          ) {
             await commandModule.default(registry);
             botLogger.info(`✅ Loaded command from: ${file}`);
-          } else if (commandModule.registerCommands && typeof commandModule.registerCommands === "function") {
+          } else if (
+            commandModule.registerCommands &&
+            typeof commandModule.registerCommands === "function"
+          ) {
             await commandModule.registerCommands(registry);
             botLogger.info(`✅ Loaded commands from: ${file}`);
           } else {
@@ -402,9 +495,13 @@ async function loadCommands(registry, botLogger) {
         }
       }
 
-      botLogger.info(`✅ Successfully loaded commands from ${commandFiles.length} files`);
+      botLogger.info(
+        `✅ Successfully loaded commands from ${commandFiles.length} files`
+      );
     } catch (dirError) {
-      botLogger.warn(`Commands directory not found: ${commandsPath}. Creating default commands only.`);
+      botLogger.warn(
+        `Commands directory not found: ${commandsPath}. Creating default commands only.`
+      );
     }
   } catch (error) {
     botLogger.error("Error loading commands:", error);
@@ -412,78 +509,24 @@ async function loadCommands(registry, botLogger) {
 }
 
 /**
- * Handle bot mentions in groups with improved logic
- */
-async function handleBotMention(messageInfo) {
-  const { text, isGroup, sock, sender, botLogger, registry } = messageInfo;
-  if (!isGroup || typeof text !== "string" || !text.includes("@")) return false;
-  
-  const botNumber = sock.user?.id?.split(":")[0];
-  if (!botNumber || !text.includes(`@${botNumber}`)) return false;
-
-  try {
-    await sendMessageWithTyping(
-      {
-        text: `👋 Halo! Ada yang bisa saya bantu?\nKetik ${registry.prefix}help untuk melihat perintah yang tersedia.`,
-        buttons: [
-          {
-            buttonId: `${registry.prefix}help`,
-            buttonText: { displayText: "📋 Show Commands" },
-            type: 1
-          },
-          {
-            buttonId: `${registry.prefix}info`,
-            buttonText: { displayText: "ℹ️ Bot Info" },
-            type: 1
-          }
-        ],
-        headerType: 1
-      },
-      sender,
-      sock,
-      botLogger
-    );
-
-    botLogger.info(`Bot mentioned in group ${sender}, responded with interactive help message`);
-    return true;
-  } catch (error) {
-    // Fallback to simple text if buttons fail
-    try {
-      await sendMessageWithTyping(
-        {
-          text: `👋 Halo! Ada yang bisa saya bantu?\nKetik ${registry.prefix}help untuk melihat perintah yang tersedia.`,
-        },
-        sender,
-        sock,
-        botLogger
-      );
-      botLogger.info(`Bot mentioned in group ${sender}, responded with simple help message`);
-      return true;
-    } catch (fallbackError) {
-      botLogger.error("Error handling bot mention (including fallback):", fallbackError);
-      return false;
-    }
-  }
-}
-
-/**
  * Process regular messages (non-commands)
  */
 async function processRegularMessage(messageInfo) {
-  const { botLogger, text, hasMedia, sender, isButtonResponse, buttonData } = messageInfo;
+  const { botLogger, text, hasMedia, sender, isButtonResponse, buttonData } =
+    messageInfo;
 
   try {
     if (isButtonResponse) {
       botLogger.debug(`🔘 Button response from ${sender}:`, {
         buttonId: buttonData?.buttonId,
         displayText: buttonData?.displayText,
-        type: buttonData?.type
+        type: buttonData?.type,
       });
     } else {
-      const logText = hasMedia 
-        ? "[Media Message]" 
+      const logText = hasMedia
+        ? "[Media Message]"
         : text?.substring(0, 100) + (text?.length > 100 ? "..." : "");
-        
+
       botLogger.debug(`💬 Regular message from ${sender}: ${logText}`);
     }
   } catch (error) {
@@ -495,33 +538,33 @@ async function processRegularMessage(messageInfo) {
  * Main message processor (used by queue)
  */
 export async function processMessageFromQueue(messageInfo) {
-  const { botLogger, registry, text, isButtonResponse, buttonData } = messageInfo;
+  const { botLogger, registry, text, isButtonResponse, buttonData } =
+    messageInfo;
 
   try {
     // 1. Process commands first (highest priority)
     // Check if it's a command from text or button response
-    const isCommand = text?.startsWith(registry.prefix) || 
-                     (isButtonResponse && buttonData?.buttonId?.startsWith(registry.prefix));
+    const isCommand =
+      text?.startsWith(registry.prefix) ||
+      (isButtonResponse && buttonData?.buttonId?.startsWith(registry.prefix));
 
     if (isCommand) {
       // For button responses, ensure the text is set to buttonId for command processing
       if (isButtonResponse && buttonData?.buttonId) {
         messageInfo.text = buttonData.buttonId;
       }
-      
-      await registry.processMessage(messageInfo);
-      return;
-    }
 
-    // 2. Handle bot mentions in groups
-    if (await handleBotMention(messageInfo)) {
+      await registry.processMessage(messageInfo);
       return;
     }
 
     // 3. Process regular messages (including non-command button responses)
     await processRegularMessage(messageInfo);
   } catch (error) {
-    botLogger.error(`Error in message queue processor for ${messageInfo.sender}:`, error);
+    botLogger.error(
+      `Error in message queue processor for ${messageInfo.sender}:`,
+      error
+    );
     throw error;
   }
 }
@@ -529,7 +572,13 @@ export async function processMessageFromQueue(messageInfo) {
 /**
  * Create optimized message handler with command loading
  */
-export function createMessageHandler(sock, registry, botLogger, groupCache, queue) {
+export function createMessageHandler(
+  sock,
+  registry,
+  botLogger,
+  groupCache,
+  queue
+) {
   loadCommands(registry, botLogger).catch((error) => {
     botLogger.error("Failed to load commands:", error);
   });
@@ -552,7 +601,14 @@ export function createMessageHandler(sock, registry, botLogger, groupCache, queu
 /**
  * Enhanced handle incoming message with better button support
  */
-export async function handleIncomingMessage(sock, msg, registry, botLogger, groupCache, queue) {
+export async function handleIncomingMessage(
+  sock,
+  msg,
+  registry,
+  botLogger,
+  groupCache,
+  queue
+) {
   try {
     if (!msg.message || msg.key.fromMe) return;
 
@@ -567,13 +623,14 @@ export async function handleIncomingMessage(sock, msg, registry, botLogger, grou
       return;
     }
 
-    // Extract message content with enhanced button support
     const messageContent = await extractMessageContent(msg);
 
     // Skip invalid messages or pure messageContextInfo without other content
     if (!messageContent.isValid || messageContent.isOnlyContextInfo) {
       if (messageContent.isOnlyContextInfo) {
-        botLogger.debug(`📋 Pure messageContextInfo from ${sender}: Skipping metadata-only message`);
+        botLogger.debug(
+          `📋 Pure messageContextInfo from ${sender}: Skipping metadata-only message`
+        );
       } else {
         botLogger.debug(`❌ Invalid/empty message from ${sender}: Skipping`);
       }
@@ -585,26 +642,40 @@ export async function handleIncomingMessage(sock, msg, registry, botLogger, grou
     let logText;
 
     if (messageContent.isButtonResponse) {
-      const buttonType = messageContent.buttonData?.type?.toUpperCase() || 'BUTTON';
-      logPrefix = messageContent.isMixedMessage ? `🔄 [MIXED+${buttonType}]` : `🔘 [${buttonType}]`;
-      
-      const buttonId = messageContent.buttonData?.buttonId || 'N/A';
-      const displayText = messageContent.buttonData?.displayText || 'N/A';
+      const buttonType =
+        messageContent.buttonData?.type?.toUpperCase() || "BUTTON";
+      logPrefix = messageContent.isMixedMessage
+        ? `🔄 [MIXED+${buttonType}]`
+        : `🔘 [${buttonType}]`;
+
+      const buttonId = messageContent.buttonData?.buttonId || "N/A";
+      const displayText = messageContent.buttonData?.displayText || "N/A";
       logText = `ButtonID: "${buttonId}" | Display: "${displayText}"`;
-      
+
       // Log if this will trigger a command
       if (buttonId.startsWith(registry.prefix)) {
         botLogger.info(`🚀 Button will execute command: ${buttonId}`);
       }
     } else if (messageContent.hasMedia) {
       logPrefix = "📎 [MEDIA]";
-      logText = `${messageContent.type} ${messageContent.text ? `with caption: "${messageContent.text.substring(0, 50)}..."` : '(no caption)'}`;
-    } else if (messageContent.isContextInfo && !messageContent.isOnlyContextInfo) {
+      logText = `${messageContent.type} ${
+        messageContent.text
+          ? `with caption: "${messageContent.text.substring(0, 50)}..."`
+          : "(no caption)"
+      }`;
+    } else if (
+      messageContent.isContextInfo &&
+      !messageContent.isOnlyContextInfo
+    ) {
       logPrefix = "📋 [CONTEXT+TEXT]";
-      logText = messageContent.text.substring(0, 50) + (messageContent.text.length > 50 ? "..." : "");
+      logText =
+        messageContent.text.substring(0, 50) +
+        (messageContent.text.length > 50 ? "..." : "");
     } else {
       logPrefix = "💬 [TEXT]";
-      logText = messageContent.text.substring(0, 50) + (messageContent.text.length > 50 ? "..." : "");
+      logText =
+        messageContent.text.substring(0, 50) +
+        (messageContent.text.length > 50 ? "..." : "");
     }
 
     botLogger.info(`📨 ${logPrefix} from ${sender}: ${logText}`);
@@ -615,7 +686,12 @@ export async function handleIncomingMessage(sock, msg, registry, botLogger, grou
     let isAdmin = false;
 
     if (isGroup) {
-      const groupMetadata = await getGroupMetadata(sender, sock, groupCache, botLogger);
+      const groupMetadata = await getGroupMetadata(
+        sender,
+        sock,
+        groupCache,
+        botLogger
+      );
       isAdmin = isUserAdmin(participantId, groupMetadata);
     }
 
@@ -636,7 +712,8 @@ export async function handleIncomingMessage(sock, msg, registry, botLogger, grou
       isMixedMessage: messageContent.isMixedMessage,
       buttonData: messageContent.buttonData,
       allMessageTypes: messageContent.allMessageTypes,
-      mentions: msg.message?.extendedTextMessage?.contextInfo?.mentionedJid || [],
+      mentions:
+        msg.message?.extendedTextMessage?.contextInfo?.mentionedJid || [],
       sock,
       registry,
       botLogger,
@@ -646,8 +723,20 @@ export async function handleIncomingMessage(sock, msg, registry, botLogger, grou
 
     // Determine queue priority
     let priority = "normal";
-    const isCommand = messageContent.text?.startsWith(registry.prefix) || 
-                     (messageContent.isButtonResponse && messageContent.buttonData?.buttonId?.startsWith(registry.prefix));
+    const isCommand =
+      messageContent.text?.startsWith(registry.prefix) ||
+      (messageContent.isButtonResponse &&
+        messageContent.buttonData?.buttonId?.startsWith(registry.prefix));
+    // penghentian command
+    
+    const owners = msg.key.participant || sender;
+    const stopped = await handleMessage(
+      sock,
+      owners,
+      messageContent,
+      registry
+    );
+    if (stopped) return;
 
     if (isCommand || messageContent.isButtonResponse) {
       priority = "high";
@@ -658,9 +747,8 @@ export async function handleIncomingMessage(sock, msg, registry, botLogger, grou
       isPremium: isAdmin,
       priority: priority,
     });
-
   } catch (error) {
-    botLogger.error("Error handling incoming message:", error);
+    console.log(error);
   }
 }
 

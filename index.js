@@ -46,8 +46,12 @@ queue.setDefaultHandler(async (msg) => {
 
 // 3. Jalankan bot dan pass queue-nya
 (async () => {
-  await config.initDatabases();
-  console.log("DEBUG: Apakah queue valid?", typeof queue, !!queue);
-  setInterval(() => fileManager.cleanTempFiles(), 10 * 60 * 1000);
-  await initBot(queue); // kirim queue ke dalam bot.js
+  try {
+    await config.initDatabases();
+    console.log("DEBUG: Apakah queue valid?", typeof queue, !!queue);
+    setInterval(() => fileManager.cleanTempFiles(), 10 * 60 * 1000);
+    await initBot(queue); // kirim queue ke dalam bot.js
+  } catch (error) {
+    console.log(error);
+  }
 })();

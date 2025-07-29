@@ -14,6 +14,7 @@
 
 > fix error untuk registry command dan mengarahkan ke yang benar :V
 > Tambah Command dan tambah database 
+> ganti prefix menjadi ! yang awalnya adalah /
 
 # *Version 0.0.4*
 
@@ -31,3 +32,17 @@
 # *Version 0.0.6*
 
 > fix bug library downloader Youtube 
+> ganti lib menjadi punya naruyaizumi
+> nambah fitur yta, ytv, ytinfo
+
+# *Version 0.0.6*
+
+> fix bug library downloader Youtube 
+> ganti lib menjadi punya naruyaizumi
+> nambah fitur yta, ytv, ytinfo
+
+# *Version 0.0.7*
+
+> add command security group 
+> add auto response bot maintenance atau off
+> fitur owner tapi ngebug
