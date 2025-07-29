@@ -152,7 +152,7 @@ console.log("📂 Folder untuk image:", imageDir);
 
 ## Penggunaan JSONManager
 
-Berikut ini adalah contoh **penggunaan praktis dan lengkap** dari class `JSONManager` yang kamu buat, untuk kasus umum seperti pengelolaan data konfigurasi bot, cache user, atau penyimpanan sederhana.
+Berikut ini adalah contoh **penggunaan praktis dan lengkap** dari class `JSONManager` yang saya buat, untuk kasus umum seperti pengelolaan data konfigurasi bot, cache user, atau penyimpanan sederhana.
 
 ---
 
@@ -299,7 +299,7 @@ console.log("✅ JSONManager ditutup dengan aman");
 * Gunakan `.get("a.b.c")` untuk mengakses properti nested dengan mudah.
 ## License
 
-[MIT](https://choosealicense.com/licenses/mit/)
+[MIT](LICENCE)
 
 
 ## Authors
