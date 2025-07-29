@@ -1,1 +1,389 @@
-const _0x49a23c=_0x1559;function _0x1f25(){const _0x3db02b=['Connection\x20closed:','info','model','prefix','connection.update','generate','4009398uksAvi','Method\x20Not\x20Allowed\x20error\x20-\x20clearing\x20session\x20and\x20restarting...','message','__oblivinx_auth','then','loggedOut','\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20Dibuat\x20oleh:\x20Natz6N\x0a======================================================\x20\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20','👑\x20Owner\x20\x20\x20\x20\x20\x20\x20:','YYYY-MM-DD\x20HH:mm:ss','get','pow','Max\x20reconnection\x20attempts\x20reached.\x20Please\x20restart\x20the\x20bot\x20manually.','🐱\x20GitHub\x20\x20\x20\x20\x20\x20:','close','2278432fLoCnq','💻\x20Hostname\x20\x20\x20\x20:','Error\x20updating\x20group\x20participants\x20for\x20','connecting','15447393DNXaJb','Error\x20during\x20reconnection:','clear','87793482662','silent','Waiting\x20','🕒\x20Started\x20at\x20\x20:','╰─────────────────────────────────────────────╯','groups.update','green','65916yKYbVb','requestPairingCode','WhatsApp/2.23.24.76\x20Mozilla/5.0\x20(Macintosh;\x20Intel\x20Mac\x20OS\x20X\x2010_15_7)\x20AppleWebKit/537.36\x20(KHTML,\x20like\x20Gecko)\x20Chrome/109.0.0.0\x20Safari/537.36','╭─────────────────────────────────────────────╮','Unknown\x20error','default','Reconnection\x20attempt\x20','platform','🌐\x20Instagram\x20\x20\x20:','chalk','round','callDB','✅\x20Bot\x20connected\x20successfully!','1745072urzJMp','log','🔄\x20Connecting\x20to\x20WhatsApp...','Error\x20requesting\x20pairing\x20code:','📂\x20Working\x20Dir\x20:','messages.upsert','bold','Bot\x20is\x20ready\x20to\x20receive\x20messages!','existsSync','\x20MB','version','Boom','💾\x20RAM\x20\x20\x20\x20\x20\x20\x20\x20\x20:','OblivinxBot','592432dAVgsN','statusCode','pino-pretty','ownerDB','owners','📣\x20Jangan\x20lupa\x20support\x20terus\x20ya\x20💖','📌\x20Author\x20\x20\x20\x20\x20\x20:','...','Connection\x20logged\x20out.\x20Please\x20scan\x20QR\x20again.','set','🧠\x20Total\x20CPU\x20\x20\x20:','arch','Queue\x20is\x20required\x20for\x20bot\x20initialization','🧠\x20CPU\x20Model\x20\x20\x20:','ms\x20before\x20reconnecting...','\x20core(s)','\x20Natz6N','Initialization\x20failed,\x20retrying...\x20(','error','totalmem','setDefaultHandler','cwd','QR\x20RECEIVED','1654644iWYirK','Botinfo','Chrome','setPrefix','groupMetadata','cyan','Error\x20updating\x20group\x20metadata\x20for\x20','open','creds.update','🖥️\x20Platform\x20\x20\x20\x20:','min','group-participants.update','gray','\x0a🔥\x20Terima\x20kasih\x20sudah\x20menggunakan\x20bot\x20ini!','output','5fBoxnI','Error\x20initializing\x20bot:','join','🔧\x20Prefix\x20\x20\x20\x20\x20\x20:','─────────────────────────────────────────────\x0a','Error\x20clearing\x20auth\x20session:','rmSync','cpus','format','110.0.5481.77','Pairing\x20code\x20enabled,\x20code:\x20','42CgeWzZ','length','\x0a\x20\x20____\x20\x20_\x20\x20\x20\x20\x20_\x20_\x20\x20\x20\x20\x20\x20\x20\x20_\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20____\x20\x20\x20\x20\x20\x20\x20\x20_\x20\x20\x20\x0a\x20/\x20__\x20\x5c|\x20|\x20\x20\x20|\x20(_)\x20\x20\x20\x20\x20\x20(_)\x20\x20\x20\x20\x20\x20\x20\x20|\x20\x20_\x20\x5c\x20\x20\x20\x20\x20\x20|\x20|\x20\x20\x0a|\x20|\x20\x20|\x20|\x20|__\x20|\x20|___\x20\x20___\x20_\x20_\x20__\x20\x20__|\x20|_)\x20|\x20___\x20|\x20|_\x20\x0a|\x20|\x20\x20|\x20|\x20\x27_\x20\x5c|\x20|\x20\x5c\x20\x5c/\x20/\x20|\x20|\x20\x27_\x20\x5c/\x20__|\x20\x20_\x20<\x20/\x20_\x20\x5c|\x20__|\x0a|\x20|__|\x20|\x20|_)\x20|\x20|\x20|>\x20\x20<|\x20|\x20|\x20|\x20|\x20\x5c__\x20\x5c\x20|_)\x20|\x20(_)\x20|\x20|_\x20\x0a\x20\x5c____/|_.__/|_|_/_/\x5c_\x5c_|_|_|\x20|_|___/____/\x20\x5c___/\x20\x5c__|\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x0a======================================================\x20\x0a\x20\x20\x20\x20Versi:\x20','hostname','│\x20\x20\x20\x20\x20\x20\x20\x20\x20🤖\x20Bot\x20WhatsApp\x20Aktif!\x20🎉\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20│','Auth\x20session\x20cleared','setOwners'];_0x1f25=function(){return _0x3db02b;};return _0x1f25();}(function(_0x65b2df,_0x2d5ec1){const _0xc13226=_0x1559,_0x29863e=_0x65b2df();while(!![]){try{const _0x546627=-parseInt(_0xc13226(0x1db))/0x1+-parseInt(_0xc13226(0x1c0))/0x2*(parseInt(_0xc13226(0x20c))/0x3)+parseInt(_0xc13226(0x1f2))/0x4*(parseInt(_0xc13226(0x201))/0x5)+-parseInt(_0xc13226(0x219))/0x6+parseInt(_0xc13226(0x1cd))/0x7+-parseInt(_0xc13226(0x227))/0x8+parseInt(_0xc13226(0x22b))/0x9;if(_0x546627===_0x2d5ec1)break;else _0x29863e['push'](_0x29863e['shift']());}catch(_0x1d0418){_0x29863e['push'](_0x29863e['shift']());}}}(_0x1f25,0x5aee5));import{makeWASocket,useMultiFileAuthState,DisconnectReason,isJidNewsletter}from'naruyaizumi';import _0x5797a6 from'pino';import _0x382896 from'qrcode-terminal';import*as _0xc6037b from'@hapi/boom';import{MessageRegistry}from'./Clients/RegistryCommands.js';import{createMessageHandler,processMessageFromQueue,delay}from'./Clients/messageClients.js';import _0x1fe9f7 from'os';import{setupAntiCall}from'./Clients/Settings/antiCall.js';import _0x48a46b from'./config.js';import _0x46c53f from'dayjs';const groupCache=new Map();let pairingCodeRequested=![],globalQueue=null,reconnectAttempts=0x0;function _0x1559(_0x501ade,_0xba508d){const _0x1f250d=_0x1f25();return _0x1559=function(_0x155938,_0x17801a){_0x155938=_0x155938-0x1ba;let _0x1fc402=_0x1f250d[_0x155938];return _0x1fc402;},_0x1559(_0x501ade,_0xba508d);}const MAX_RECONNECT_ATTEMPTS=0x5;export const botLogger=_0x5797a6({'level':_0x49a23c(0x214),'transport':{'target':_0x49a23c(0x1dd),'options':{'colorize':!![]}}});export default async function initBot(_0x13b015){const _0x13dde2=_0x49a23c;try{const _0x1eb7ab=await import(_0x13dde2(0x1c9))[_0x13dde2(0x21d)](_0x2dd76e=>_0x2dd76e[_0x13dde2(0x1c5)]);_0x13b015&&(globalQueue=_0x13b015);const _0x1e84b2=_0x13b015||globalQueue;if(!_0x1e84b2)throw new Error(_0x13dde2(0x1e7));const {state:_0x4bd59d,saveCreds:_0x2c61f8}=await useMultiFileAuthState(_0x13dde2(0x21c)),_0x22fec2=makeWASocket({'auth':_0x4bd59d,'printQRInTerminal':!![],'logger':_0x5797a6({'level':_0x13dde2(0x1ba)}),'browser':[_0x13dde2(0x1da),_0x13dde2(0x1f4),_0x13dde2(0x20a)],'cachedGroupMetadata':async _0x45e674=>groupCache[_0x13dde2(0x222)](_0x45e674),'connectTimeoutMs':0xea60,'defaultQueryTimeoutMs':0xea60,'keepAliveIntervalMs':0x2710,'markOnlineOnConnect':!![],'syncFullHistory':![],'options':{'headers':{'User-Agent':_0x13dde2(0x1c2)}}}),_0x296a88=new MessageRegistry(_0x22fec2,botLogger),_0x514b55=_0x48a46b[_0x13dde2(0x1de)][_0x13dde2(0x222)](_0x13dde2(0x1df),[])||[];_0x296a88[_0x13dde2(0x1f5)](_0x48a46b[_0x13dde2(0x216)])[_0x13dde2(0x212)](_0x514b55),_0x1e84b2[_0x13dde2(0x1ef)](processMessageFromQueue),_0x22fec2['ev']['on'](_0x13dde2(0x1fa),_0x2c61f8),setupAntiCall(_0x22fec2,_0x48a46b[_0x13dde2(0x1cb)],botLogger),_0x22fec2['ev']['on'](_0x13dde2(0x1be),async _0x5eaf4f=>{const _0x10c052=_0x13dde2;for(const _0x2550f9 of _0x5eaf4f){try{const _0x48c17e=await _0x22fec2[_0x10c052(0x1f6)](_0x2550f9['id']);groupCache[_0x10c052(0x1e4)](_0x2550f9['id'],_0x48c17e);}catch(_0x5650e5){botLogger[_0x10c052(0x1ed)](_0x10c052(0x1f8)+_0x2550f9['id']+':',_0x5650e5);}}}),_0x22fec2['ev']['on'](_0x13dde2(0x1fd),async _0x152fd0=>{const _0x20ab3d=_0x13dde2;try{const _0xe77e5a=await _0x22fec2[_0x20ab3d(0x1f6)](_0x152fd0['id']);groupCache[_0x20ab3d(0x1e4)](_0x152fd0['id'],_0xe77e5a);}catch(_0x91f20a){botLogger[_0x20ab3d(0x1ed)](_0x20ab3d(0x229)+_0x152fd0['id']+':',_0x91f20a);}});const _0x5b0a83=createMessageHandler(_0x22fec2,_0x296a88,botLogger,groupCache,_0x1e84b2);return _0x22fec2['ev']['on'](_0x13dde2(0x1d2),_0x5b0a83),_0x22fec2['ev']['on'](_0x13dde2(0x217),async _0x300f46=>{const _0x397d3f=_0x13dde2,{connection:_0x491b08,lastDisconnect:_0x5e3365,qr:_0x500567}=_0x300f46;if(_0x500567){console[_0x397d3f(0x1ce)](_0x397d3f(0x1f1)),_0x382896[_0x397d3f(0x218)](_0x500567,{'small':!![]});const _0x9e555=![];if(_0x9e555&&!pairingCodeRequested)try{const _0x53ebf6=await _0x22fec2[_0x397d3f(0x1c1)](_0x397d3f(0x22e));console[_0x397d3f(0x1ce)](_0x397d3f(0x20b)+_0x53ebf6),pairingCodeRequested=!![];}catch(_0x325360){console[_0x397d3f(0x1ed)](_0x397d3f(0x1d0),_0x325360);}}if(_0x491b08===_0x397d3f(0x226)){const _0x52aa61=_0x5e3365?.[_0x397d3f(0x1ed)]instanceof _0xc6037b[_0x397d3f(0x1d8)]&&_0x5e3365[_0x397d3f(0x1ed)][_0x397d3f(0x200)]?.[_0x397d3f(0x1dc)]!==DisconnectReason[_0x397d3f(0x21e)];console[_0x397d3f(0x1ce)](_0x397d3f(0x213),_0x5e3365?.[_0x397d3f(0x1ed)]?.[_0x397d3f(0x21b)]||_0x397d3f(0x1c4));const _0x4745cc=_0x5e3365?.[_0x397d3f(0x1ed)]?.[_0x397d3f(0x200)]?.[_0x397d3f(0x1dc)];if(_0x4745cc===0x195){console[_0x397d3f(0x1ce)](_0x397d3f(0x21a));try{const _0x4e6a19=await import('fs');_0x4e6a19[_0x397d3f(0x1d5)](_0x397d3f(0x21c))&&(_0x4e6a19[_0x397d3f(0x207)](_0x397d3f(0x21c),{'recursive':!![],'force':!![]}),console[_0x397d3f(0x1ce)](_0x397d3f(0x211)));}catch(_0x1cf962){console[_0x397d3f(0x1ed)](_0x397d3f(0x206),_0x1cf962);}pairingCodeRequested=![],reconnectAttempts=0x0;}if(_0x52aa61&&reconnectAttempts<MAX_RECONNECT_ATTEMPTS){reconnectAttempts++,console[_0x397d3f(0x1ce)](_0x397d3f(0x1c6)+reconnectAttempts+'/'+MAX_RECONNECT_ATTEMPTS+_0x397d3f(0x1e2));const _0x100b26=Math[_0x397d3f(0x1fc)](0x7d0*Math[_0x397d3f(0x223)](0x2,reconnectAttempts-0x1),0x7530);console[_0x397d3f(0x1ce)](_0x397d3f(0x1bb)+_0x100b26+_0x397d3f(0x1e9)),await delay(_0x100b26);try{await initBot();}catch(_0x518dad){console[_0x397d3f(0x1ed)](_0x397d3f(0x22c),_0x518dad);}}else{if(_0x4745cc===DisconnectReason[_0x397d3f(0x21e)])console[_0x397d3f(0x1ce)](_0x397d3f(0x1e3)),reconnectAttempts=0x0,pairingCodeRequested=![];else reconnectAttempts>=MAX_RECONNECT_ATTEMPTS&&(console[_0x397d3f(0x1ce)](_0x397d3f(0x224)),reconnectAttempts=0x0);}}else{if(_0x491b08===_0x397d3f(0x1f9))console[_0x397d3f(0x1ce)](''),console[_0x397d3f(0x1ce)](_0x397d3f(0x1cc)),botLogger[_0x397d3f(0x214)](_0x397d3f(0x1d4)),reconnectAttempts=0x0,console[_0x397d3f(0x22d)](),console[_0x397d3f(0x1ce)](_0x397d3f(0x20e)+_0x48a46b[_0x397d3f(0x1f3)][_0x397d3f(0x1d7)]+_0x397d3f(0x21f)),console[_0x397d3f(0x1ce)](_0x1eb7ab[_0x397d3f(0x1bf)][_0x397d3f(0x1d3)](_0x397d3f(0x1c3))),console[_0x397d3f(0x1ce)](_0x1eb7ab[_0x397d3f(0x1bf)][_0x397d3f(0x1d3)](_0x397d3f(0x210))),console[_0x397d3f(0x1ce)](_0x1eb7ab[_0x397d3f(0x1bf)][_0x397d3f(0x1d3)](_0x397d3f(0x1bd))),console[_0x397d3f(0x1ce)](_0x1eb7ab[_0x397d3f(0x1f7)](_0x397d3f(0x1e1))+_0x397d3f(0x1eb)),console[_0x397d3f(0x1ce)](_0x1eb7ab[_0x397d3f(0x1f7)](_0x397d3f(0x1c8))+_0x397d3f(0x1eb)),console[_0x397d3f(0x1ce)](_0x1eb7ab[_0x397d3f(0x1f7)](_0x397d3f(0x225))+_0x397d3f(0x1eb)),console[_0x397d3f(0x1ce)](_0x1eb7ab[_0x397d3f(0x1f7)](_0x397d3f(0x204))+'\x20'+_0x48a46b[_0x397d3f(0x216)]),console[_0x397d3f(0x1ce)](_0x1eb7ab[_0x397d3f(0x1f7)](_0x397d3f(0x1bc))+'\x20'+_0x46c53f()[_0x397d3f(0x209)](_0x397d3f(0x221))),console[_0x397d3f(0x1ce)](_0x1eb7ab[_0x397d3f(0x1f7)](_0x397d3f(0x228))+'\x20'+_0x1fe9f7[_0x397d3f(0x20f)]()),console[_0x397d3f(0x1ce)](_0x1eb7ab[_0x397d3f(0x1f7)](_0x397d3f(0x1fb))+'\x20'+_0x1fe9f7[_0x397d3f(0x1c7)]()+'\x20'+_0x1fe9f7[_0x397d3f(0x1e6)]()),console[_0x397d3f(0x1ce)](_0x1eb7ab[_0x397d3f(0x1f7)](_0x397d3f(0x1d1))+'\x20'+process[_0x397d3f(0x1f0)]()),console[_0x397d3f(0x1ce)](_0x1eb7ab[_0x397d3f(0x1f7)](_0x397d3f(0x1e8))+'\x20'+_0x1fe9f7[_0x397d3f(0x208)]()[0x0][_0x397d3f(0x215)]),console[_0x397d3f(0x1ce)](_0x1eb7ab[_0x397d3f(0x1f7)](_0x397d3f(0x1e5))+'\x20'+_0x1fe9f7[_0x397d3f(0x208)]()[_0x397d3f(0x20d)]+_0x397d3f(0x1ea)),console[_0x397d3f(0x1ce)](_0x1eb7ab[_0x397d3f(0x1f7)](_0x397d3f(0x1d9))+'\x20'+Math[_0x397d3f(0x1ca)](_0x1fe9f7[_0x397d3f(0x1ee)]()/0x400/0x400)+_0x397d3f(0x1d6)),console[_0x397d3f(0x1ce)](_0x1eb7ab[_0x397d3f(0x1f7)](_0x397d3f(0x220))+'\x20'+_0x514b55[_0x397d3f(0x203)](',\x20')),console[_0x397d3f(0x1ce)](_0x1eb7ab[_0x397d3f(0x1bf)][_0x397d3f(0x1d3)](_0x397d3f(0x1ff))),console[_0x397d3f(0x1ce)](_0x1eb7ab[_0x397d3f(0x1bf)][_0x397d3f(0x1d3)](_0x397d3f(0x1e0))),console[_0x397d3f(0x1ce)](_0x1eb7ab[_0x397d3f(0x1fe)](_0x397d3f(0x205)));else _0x491b08===_0x397d3f(0x22a)&&console[_0x397d3f(0x1ce)](_0x397d3f(0x1cf));}}),_0x22fec2;}catch(_0x41fd53){botLogger[_0x13dde2(0x1ed)](_0x13dde2(0x202),_0x41fd53);if(reconnectAttempts<MAX_RECONNECT_ATTEMPTS)return reconnectAttempts++,console[_0x13dde2(0x1ce)](_0x13dde2(0x1ec)+reconnectAttempts+'/'+MAX_RECONNECT_ATTEMPTS+')'),await delay(0x1388),await initBot(_0x13b015);throw _0x41fd53;}}
+// bot.js - Main bot initialization file
+import {
+  makeWASocket,
+  useMultiFileAuthState,
+  DisconnectReason,
+  isJidNewsletter,
+} from "naruyaizumi";
+import Pino from "pino";
+import qrcode from "qrcode-terminal";
+import * as Boom from "@hapi/boom";
+import { MessageRegistry } from "./Clients/RegistryCommands.js";
+import {
+  createMessageHandler,
+  processMessageFromQueue,
+  delay,
+} from "./Clients/messageClients.js";
+import { handleIncomingMessage } from "./Clients/messageClients.js";
+import os from "os";
+import { setupAntiCall } from "./Clients/Settings/antiCall.js";
+import config from "./config.js";
+import dayjs from "dayjs";
+import {
+  generateGoodbyeCard,
+  generateWelcomeCard,
+} from "./Clients/groupHandle.js";
+
+import path from "path";
+import { fileURLToPath } from "url";
+const groupCache = new Map();
+let pairingCodeRequested = false;
+let globalQueue = null;
+let reconnectAttempts = 0;
+const MAX_RECONNECT_ATTEMPTS = 5;
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+// Create logger
+export const botLogger = Pino({
+  level: "info",
+  transport: {
+    target: "pino-pretty",
+    options: {
+      colorize: true,
+    },
+  },
+});
+
+export default async function initBot(queue) {
+  try {
+    const chalk = await import("chalk").then((m) => m.default);
+
+    // Store queue reference globally for reconnection
+    if (queue) {
+      globalQueue = queue;
+    }
+
+    // Use global queue if no queue parameter provided (during reconnection)
+    const currentQueue = queue || globalQueue;
+
+    if (!currentQueue) {
+      throw new Error("Queue is required for bot initialization");
+    }
+
+    const { state, saveCreds } = await useMultiFileAuthState("__oblivinx_auth");
+
+    const sock = makeWASocket({
+      auth: state,
+      printQRInTerminal: true,
+      logger: Pino({ level: "silent" }),
+      browser: ["OblivinxBot", "Chrome", "110.0.5481.77"],
+      cachedGroupMetadata: async (jid) => groupCache.get(jid),
+      // Add these connection options to improve stability
+      connectTimeoutMs: 60000,
+      defaultQueryTimeoutMs: 60000,
+      keepAliveIntervalMs: 10000,
+      markOnlineOnConnect: true,
+      syncFullHistory: false,
+      // Add user agent and other headers
+      options: {
+        headers: {
+          "User-Agent":
+            "WhatsApp/2.23.24.76 Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36",
+        },
+      },
+    });
+
+    const registry = new MessageRegistry(sock, botLogger);
+    const owners = config.ownerDB.get("owners", []) || [];
+    registry.setPrefix(config.prefix).setOwners(owners);
+
+    currentQueue.setDefaultHandler(processMessageFromQueue);
+
+    // Handle credentials update
+    sock.ev.on("creds.update", saveCreds);
+    setupAntiCall(sock, config.callDB, botLogger);
+    
+    sock.ev.on("group-participants.update", async (update) => {
+      const { id: groupId, participants, action } = update;
+      console.log(update);
+      try {
+        const metadata = await sock.groupMetadata(groupId);
+        const groupName = metadata.subject;
+
+        console.log(
+          `[Bot] Group participants update in ${groupName}: ${action}`
+        );
+
+        const defaults = path.join(__dirname, "./src/media/images.jpg");
+
+        for (const participant of participants) {
+          try {
+            // Ambil foto profil
+            let profilePicture;
+            try {
+              profilePicture = await sock.profilePictureUrl(
+                participant,
+                "image"
+              );
+            } catch {
+              profilePicture = defaults;
+              console.log(`[Bot] No profile picture for ${participant}`);
+            }
+
+            // Ambil nama pengguna
+            let userName = participant.split("@")[0]; // default
+            try {
+              const participant = metadata.participants.find(
+                (p) => p.id === participantJid
+              );
+              userName =
+                participant.name ||
+                participant.subject ||
+                participant.verifiedName ||
+                `+${
+                  participantJid.replace("@s.whatsapp.net", "").split("@")[0]
+                }`;
+            } catch {
+              let userName = "User";
+            }
+            console.log(`[Bot] Processing ${action} for user: ${userName}`);
+            try {
+              const [info] = await sock.onWhatsApp(participant);
+              userName =
+                info?.notify || info?.name || participant.split("@")[0];
+            } catch {
+              userName = participant.split("@")[0];
+            }
+
+            console.log(`[Bot] Processing ${action} for user: ${userName}`);
+
+            if (action === "add") {
+              const imageBuffer = await generateWelcomeCard({
+                userImageUrl: profilePicture,
+                userName,
+                groupName,
+              });
+
+              await sock.sendMessage(groupId, {
+                image: imageBuffer,
+                caption: `👋 Welcome @${
+                  participant.split("@")[0]
+                } to *${groupName}*!`,
+                mentions: [participant],
+              });
+
+              console.log(`[Bot] Welcome card sent for ${userName}`);
+            } else if (action === "remove") {
+              const imageBuffer = await generateGoodbyeCard({
+                userImageUrl: profilePicture,
+                userName,
+                groupName,
+              });
+
+              await sock.sendMessage(groupId, {
+                image: imageBuffer,
+                caption: `😢 @${
+                  participant.split("@")[0]
+                } has left *${groupName}*`,
+                mentions: [participant],
+              });
+
+              console.log(`[Bot] Goodbye card sent for ${userName}`);
+            }
+          } catch (participantError) {
+            console.error(
+              `[Bot] Error processing participant ${participant}:`,
+              participantError
+            );
+
+            // Fallback jika gambar gagal dibuat
+            const fallbackMsg =
+              action === "add"
+                ? `👋 Welcome @${participant.split("@")[0]} to *${groupName}*!`
+                : `😢 @${participant.split("@")[0]} has left *${groupName}*`;
+
+            try {
+              await sock.sendMessage(groupId, {
+                text: fallbackMsg,
+                mentions: [participant],
+              });
+            } catch (fallbackError) {
+              console.error(`[Bot] Fallback message failed:`, fallbackError);
+            }
+          }
+        }
+      } catch (error) {
+        console.error(
+          `[Bot] Error in group-participants.update handler:`,
+          error
+        );
+      }
+    });
+
+    // Create message handler with registry integration
+    const messageHandler = createMessageHandler(
+      sock,
+      registry,
+      botLogger,
+      groupCache,
+      currentQueue
+    );
+
+    sock.ev.on("messages.upsert", messageHandler);
+    // Handle connection updates
+    sock.ev.on("connection.update", async (update) => {
+      const { connection, lastDisconnect, qr } = update;
+      // Handle QR code - FIXED LOGIC
+      if (qr) {
+        console.log("QR RECEIVED");
+        qrcode.generate(qr, { small: true });
+
+        // Pairing code example (disabled by default)
+        const pairingCodeEnabled = false;
+        if (pairingCodeEnabled && !pairingCodeRequested) {
+          try {
+            const pairingCode = await sock.requestPairingCode("87793482662");
+            console.log("Pairing code enabled, code: " + pairingCode);
+            pairingCodeRequested = true;
+          } catch (error) {
+            console.error("Error requesting pairing code:", error);
+          }
+        }
+      }
+
+      // Handle connection status
+      if (connection === "close") {
+        const shouldReconnect =
+          lastDisconnect?.error instanceof Boom.Boom &&
+          lastDisconnect.error.output?.statusCode !==
+            DisconnectReason.loggedOut;
+
+        console.log(
+          "Connection closed:",
+          lastDisconnect?.error?.message || "Unknown error"
+        );
+
+        // Handle specific error codes
+        const statusCode = lastDisconnect?.error?.output?.statusCode;
+
+        if (statusCode === 405) {
+          console.log(
+            "Method Not Allowed error - clearing session and restarting..."
+          );
+          // Clear auth session for 405 errors
+          try {
+            const fs = await import("fs");
+            if (fs.existsSync("__oblivinx_auth")) {
+              fs.rmSync("__oblivinx_auth", { recursive: true, force: true });
+              console.log("Auth session cleared");
+            }
+          } catch (error) {
+            console.error("Error clearing auth session:", error);
+          }
+          pairingCodeRequested = false;
+          reconnectAttempts = 0;
+        }
+
+        if (shouldReconnect && reconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
+          reconnectAttempts++;
+          console.log(
+            `Reconnection attempt ${reconnectAttempts}/${MAX_RECONNECT_ATTEMPTS}...`
+          );
+
+          // Exponential backoff delay
+          const delayMs = Math.min(
+            2000 * Math.pow(2, reconnectAttempts - 1),
+            30000
+          );
+          console.log(`Waiting ${delayMs}ms before reconnecting...`);
+
+          await delay(delayMs);
+
+          try {
+            await initBot();
+          } catch (error) {
+            console.error("Error during reconnection:", error);
+          }
+        } else if (statusCode === DisconnectReason.loggedOut) {
+          console.log("Connection logged out. Please scan QR again.");
+          reconnectAttempts = 0;
+          pairingCodeRequested = false;
+        } else if (reconnectAttempts >= MAX_RECONNECT_ATTEMPTS) {
+          console.log(
+            "Max reconnection attempts reached. Please restart the bot manually."
+          );
+          reconnectAttempts = 0;
+        }
+      } else if (connection === "open") {
+        console.log("");
+        console.log("✅ Bot connected successfully!");
+        botLogger.info("Bot is ready to receive messages!");
+        reconnectAttempts = 0; // Reset on successful connection
+
+        console.clear();
+        console.log(`
+  ____  _     _ _        _          ____        _   
+ / __ \\| |   | (_)      (_)        |  _ \\      | |  
+| |  | | |__ | |___  ___ _ _ __  __| |_) | ___ | |_ 
+| |  | | '_ \\| | \\ \\/ / | | '_ \\/ __|  _ < / _ \\| __|
+| |__| | |_) | | |>  <| | | | | \\__ \\ |_) | (_) | |_ 
+ \\____/|_.__/|_|_/_/\\_\\_|_|_| |_|___/____/ \\___/ \\__|
+                                                    
+====================================================== 
+    Versi: ${config.Botinfo.version}          Dibuat oleh: Natz6N
+====================================================== 
+          `);
+        console.log(
+          chalk.green.bold("╭─────────────────────────────────────────────╮")
+        );
+        console.log(
+          chalk.green.bold("│         🤖 Bot WhatsApp Aktif! 🎉           │")
+        );
+        console.log(
+          chalk.green.bold("╰─────────────────────────────────────────────╯")
+        );
+
+        console.log(`${chalk.cyan("📌 Author      :")} Natz6N`);
+        console.log(`${chalk.cyan("🌐 Instagram   :")} Natz6N`);
+        console.log(`${chalk.cyan("🐱 GitHub      :")} Natz6N`);
+        console.log(`${chalk.cyan("🔧 Prefix      :")} ${config.prefix}`);
+        console.log(
+          `${chalk.cyan("🕒 Started at  :")} ${dayjs().format(
+            "YYYY-MM-DD HH:mm:ss"
+          )}`
+        );
+        console.log(`${chalk.cyan("💻 Hostname    :")} ${os.hostname()}`);
+        console.log(
+          `${chalk.cyan("🖥️ Platform    :")} ${os.platform()} ${os.arch()}`
+        );
+        console.log(`${chalk.cyan("📂 Working Dir :")} ${process.cwd()}`);
+        console.log(`${chalk.cyan("🧠 CPU Model   :")} ${os.cpus()[0].model}`);
+        console.log(
+          `${chalk.cyan("🧠 Total CPU   :")} ${os.cpus().length} core(s)`
+        );
+        console.log(
+          `${chalk.cyan("💾 RAM         :")} ${Math.round(
+            os.totalmem() / 1024 / 1024
+          )} MB`
+        );
+        console.log(`${chalk.cyan("👑 Owner       :")} ${owners.join(", ")}`);
+        console.log(
+          chalk.green.bold("\n🔥 Terima kasih sudah menggunakan bot ini!")
+        );
+        console.log(chalk.green.bold("📣 Jangan lupa support terus ya 💖"));
+        console.log(
+          chalk.gray("─────────────────────────────────────────────\n")
+        );
+      } else if (connection === "connecting") {
+        console.log("🔄 Connecting to WhatsApp...");
+      }
+    });
+    handleIncomingMessage(sock);
+    return sock;
+  } catch (error) {
+    botLogger.error("Error initializing bot:", error);
+
+    // If initialization fails, increment reconnect attempts
+    if (reconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
+      reconnectAttempts++;
+      console.log(
+        `Initialization failed, retrying... (${reconnectAttempts}/${MAX_RECONNECT_ATTEMPTS})`
+      );
+      await delay(5000);
+      return await initBot(queue);
+    }
+
+    throw error;
+  }
+}

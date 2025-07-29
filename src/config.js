@@ -20,7 +20,14 @@ function loadLanguageFile(langCode = "ID") {
     return {}; // fallback jika gagal
   }
 }
-
+async function getUserName(sock, jid) {
+  try {
+    const [result] = await sock.onWhatsApp(jid);
+    return result?.notify || result?.name || jid.split("@")[0]; // fallback
+  } catch (e) {
+    return jid.split("@")[0];
+  }
+}
 // Contoh penggunaan:
 const ID = loadLanguageFile("ID");
 const EN = loadLanguageFile("EN");
@@ -85,6 +92,17 @@ const isBlocked = async (number) => {
 const initDatabases = async () => {
   await Promise.all([callDB.init(), userDB.init(), ownerDB.init(), group.init()]);
 };
+async function getParticipantNames(sock, metadata) {
+  const names = {};
+
+  for (const p of metadata.participants) {
+    const jid = p.id;
+    const name = await getUserName(sock, jid);
+    names[jid] = name;
+  }
+
+  return names;
+}
 
 // Global export
 const config = {
@@ -100,6 +118,7 @@ const config = {
   isPremium,
   isBlocked,
   EN,
+  getParticipantNames,
   ID,
   loadLanguageFile,
   initDatabases,

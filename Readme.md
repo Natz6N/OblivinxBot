@@ -158,7 +158,7 @@ Berikut ini adalah contoh **penggunaan praktis dan lengkap** dari class `JSONMan
 
 1. **Instansiasi dan Inisialisasi**
 
-```ts
+```js
 import JSONManager from "./utils/JSONManager.js"; // Sesuaikan path kamu
 
 // Inisialisasi
@@ -177,7 +177,7 @@ await configManager.init(); // WAJIB dipanggil sebelum penggunaan lainnya
 
 2. **Mendapatkan Seluruh Data**
 
-```ts
+```js
 const allConfig = configManager.getData();
 console.log("📦 Konfigurasi lengkap:", allConfig);
 ```
@@ -186,7 +186,7 @@ console.log("📦 Konfigurasi lengkap:", allConfig);
 
 3. **Ambil Nilai Tertentu**
 
-```ts
+```js
 const prefix = configManager.get("bot.prefix", "!");
 console.log("⚙️ Prefix saat ini:", prefix);
 ```
@@ -195,7 +195,7 @@ console.log("⚙️ Prefix saat ini:", prefix);
 
 4. **Set Nilai (Tambah/Update)**
 
-```ts
+```js
 await configManager.set("bot.prefix", "#");
 await configManager.set("owner.number", "628xxxxxxxxxx");
 console.log("✅ Prefix dan owner di-update");
@@ -205,7 +205,7 @@ console.log("✅ Prefix dan owner di-update");
 
 5. **Push ke Array**
 
-```ts
+```js
 await configManager.push("admins", "628xxxxxxxxxx");
 console.log("➕ Admin baru ditambahkan ke daftar");
 ```
@@ -214,7 +214,7 @@ console.log("➕ Admin baru ditambahkan ke daftar");
 
 6. **Hapus Nilai**
 
-```ts
+```js
 await configManager.delete("owner.number");
 console.log("🗑️ Owner dihapus");
 ```
@@ -223,7 +223,7 @@ console.log("🗑️ Owner dihapus");
 
 7. **Merge Data (Update Banyak Sekaligus)**
 
-```ts
+```js
 await configManager.update({
   bot: {
     name: "Oblivinx",
@@ -237,7 +237,7 @@ console.log("🔁 Data bot diupdate");
 
 8. **Reset Semua Data**
 
-```ts
+```js
 await configManager.reset({
   bot: { prefix: "!" },
 });
@@ -250,14 +250,14 @@ console.log("🧹 Semua data dikembalikan ke default");
 
 ### 📤 Membuat Backup Manual
 
-```ts
+```js
 const backupPath = await configManager.createBackup();
 console.log("💾 Backup disimpan di:", backupPath);
 ```
 
 ### 📥 Restore dari Backup Tertentu
 
-```ts
+```js
 await configManager.restoreFromBackup("./src/data/backups/backup_2025-07-29T10-00-00.json");
 console.log("♻️ Data dikembalikan dari backup");
 ```
@@ -266,7 +266,7 @@ console.log("♻️ Data dikembalikan dari backup");
 
 10. **Restore dari Backup Terbaru**
 
-```ts
+```js
 await configManager.restoreFromLatestBackup();
 console.log("♻️ Data dikembalikan dari backup terbaru");
 ```
@@ -275,7 +275,7 @@ console.log("♻️ Data dikembalikan dari backup terbaru");
 
 11. **Dapatkan Daftar Semua Backup**
 
-```ts
+```js
 const backups = await configManager.getBackupList();
 console.log("📂 Semua backup tersedia:", backups);
 ```
@@ -284,7 +284,7 @@ console.log("📂 Semua backup tersedia:", backups);
 
 12. **Matikan Auto Backup dan Tutup**
 
-```ts
+```js
 await configManager.close();
 console.log("✅ JSONManager ditutup dengan aman");
 ```

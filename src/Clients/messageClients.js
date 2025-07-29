@@ -610,7 +610,7 @@ export async function handleIncomingMessage(
   queue
 ) {
   try {
-    if (!msg.message || msg.key.fromMe) return;
+    if (!msg || !msg.message || msg.key.fromMe) return;
 
     const sender = msg.key.remoteJid;
     if (!sender) {
