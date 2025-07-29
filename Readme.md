@@ -197,7 +197,7 @@ console.log("⚙️ Prefix saat ini:", prefix);
 
 ```ts
 await configManager.set("bot.prefix", "#");
-await configManager.set("owner.number", "6281234567890");
+await configManager.set("owner.number", "628xxxxxxxxxx");
 console.log("✅ Prefix dan owner di-update");
 ```
 
@@ -206,7 +206,7 @@ console.log("✅ Prefix dan owner di-update");
 5. **Push ke Array**
 
 ```ts
-await configManager.push("admins", "6289998887777");
+await configManager.push("admins", "628xxxxxxxxxx");
 console.log("➕ Admin baru ditambahkan ke daftar");
 ```
 
@@ -305,4 +305,3 @@ console.log("✅ JSONManager ditutup dengan aman");
 ## Authors
 
 - [@natzsixn](https://github.com/Natz6N)
-
