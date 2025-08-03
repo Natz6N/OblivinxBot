@@ -1,4 +1,3 @@
-import { botLogger } from "../../bot.js";
 import config from "../../config.js";
 
 export function setupAntiCall(sock, db, logger) {

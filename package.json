@@ -4,7 +4,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "npx nodemon"
+    "dev": "npx nodemon",
+    "start": "node --expose-gc src/index.js"
   },
   "keywords": [],
   "author": "Natzsixn",
