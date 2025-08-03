@@ -46,3 +46,14 @@
 > add command security group 
 > add auto response bot maintenance atau off
 > fitur owner tapi ngebug
+
+# *Version 0.0.8*
+
+> fix error security & groupcommand
+> malas fix lambat kirim gambar canvas 
+
+# *Version 0.0.9*
+
+> fix config error lupa yang mana aslinya udah lama
+> tambah command owner dan fix beberapa error group command 
+> optimize bot.js

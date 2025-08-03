@@ -1,5 +1,5 @@
 import fileManager from "../FileManager.js";
-import initBot from "./src/bot.js";
+import initBot, { botState } from "./src/bot.js";
 import MessageQueue from "./src/Clients/MessageQueue.js"; // path sesuai struktur kamu
 import config from "./src/config.js";
 
@@ -51,6 +51,14 @@ queue.setDefaultHandler(async (msg) => {
     console.log("DEBUG: Apakah queue valid?", typeof queue, !!queue);
     setInterval(() => fileManager.cleanTempFiles(), 10 * 60 * 1000);
     await initBot(queue); // kirim queue ke dalam bot.js
+    
+    botState.on("connected", () => {
+      console.log("Bot connected!");
+    });
+
+    botState.on("requiresManualIntervention", ({ reason }) => {
+      console.log(`Manual intervention needed: ${reason}`);
+    });
   } catch (error) {
     console.log(error);
   }

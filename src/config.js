@@ -1,8 +1,8 @@
 import JSONManager from "../../JSONManager.js";
 import fs from "fs";
 import path from "path";
-import dotenv from "dotenv"
-dotenv.config()
+import dotenv from "dotenv";
+dotenv.config();
 /**
  * Fungsi untuk memuat file bahasa dari direktori Lang
  * @param {string} langCode - Kode bahasa, seperti "EN", "ID"
@@ -42,7 +42,6 @@ function getLang(userId = "") {
 
   return config[langCode] || config.ID; // fallback ke ID
 }
-
 // Inisialisasi DB
 const callDB = new JSONManager({
   filePath: `${DirectDB}/calls.json`,
@@ -90,7 +89,12 @@ const isBlocked = async (number) => {
   return callData.blocked || false;
 };
 const initDatabases = async () => {
-  await Promise.all([callDB.init(), userDB.init(), ownerDB.init(), group.init()]);
+  await Promise.all([
+    callDB.init(),
+    userDB.init(),
+    ownerDB.init(),
+    group.init(),
+  ]);
 };
 async function getParticipantNames(sock, metadata) {
   const names = {};
@@ -106,9 +110,9 @@ async function getParticipantNames(sock, metadata) {
 
 // Global export
 const config = {
-  Botinfo:{
-    BotName : process.env.NAMEBOT,
-    version : process.env.VERSIONBOT
+  Botinfo: {
+    BotName: process.env.NAMEBOT,
+    version: process.env.VERSIONBOT,
   },
   prefix: "!",
   callDB,
@@ -123,7 +127,8 @@ const config = {
   loadLanguageFile,
   initDatabases,
   getLang,
-  group,
+  group
+
 };
 
 export default config;
