@@ -57,3 +57,8 @@
 > fix config error lupa yang mana aslinya udah lama
 > tambah command owner dan fix beberapa error group command 
 > optimize bot.js
+
+# *Version 0.1.0*
+> fix bug button cant send 
+> clear button i Like it 
+> security activated

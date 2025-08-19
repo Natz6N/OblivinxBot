@@ -1,30 +1,4 @@
 import config from "../config.js";
-
-function normalizeGroupId(groupId) {
-  if (!groupId) return "";
-
-  // Jika sudah lengkap dengan @g.us, return as is
-  if (groupId.endsWith("@g.us")) {
-    return groupId;
-  }
-
-  // Jika hanya berakhir dengan @g, tambahkan .us
-  if (groupId.endsWith("@g")) {
-    return groupId + ".us";
-  }
-
-  // Jika tidak ada @g sama sekali, tambahkan @g.us
-  if (!groupId.includes("@")) {
-    return groupId + "@g.us";
-  }
-
-  return groupId;
-}
-
-function normalizeJid(jid) {
-  return jid.replace(/[^0-9]/g, "");
-}
-
 export default function (registry) {
   // 1. Enhanced Anti-Link Command
   registry.addGlobalCommand({

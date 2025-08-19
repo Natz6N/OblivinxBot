@@ -1,9 +1,11 @@
-import { botLogger } from "../bot.js";
 import config from "../config.js";
 import path from "path";
 import { fileURLToPath } from "url";
 import { promises as fs } from "fs";
+
 import { createRequire } from "module";
+import { downloadMediaMessage } from "@whiskeysockets/baileys";
+import fileManager from "../FileManagers/FileManager.js";
 
 // Create require function for ES modules
 const require = createRequire(import.meta.url);
@@ -58,45 +60,77 @@ export default function (registry) {
     isowner: true,
     exec: async ({ sock, messageInfo, reply, args }) => {
       try {
-        if (!args.length) {
-          await reply("❌ *Usage Error*\n\nGunakan: broadcast <pesan>\nContoh: broadcast Halo semua!");
-          return;
-        }
-
-        const message = args.join(" ");
+        const named = messageInfo.pushName || "Owner";
         const groups = await sock.groupFetchAllParticipating();
         const groupIds = Object.keys(groups);
 
         if (groupIds.length === 0) {
-          await reply("⚠️ *No Groups*\n\nBot tidak tergabung dalam grup manapun.");
-          return;
+          return await reply("⚠️ Bot tidak tergabung dalam grup manapun.");
         }
 
-        await reply(`📡 *Broadcasting*\n\nMengirim pesan ke ${groupIds.length} grup...\n\n*Pesan:*\n${message}`);
+        const msg = messageInfo.message;
+        const isImage = !!msg?.imageMessage;
+        const isVideo = !!msg?.videoMessage;
 
-        let successCount = 0;
-        let failCount = 0;
+        const caption =
+          (args.length ? args.join(" ") : "") + `\n\n>by ${named}`;
+
+        let mediaBuffer = null;
+        let mediaType = null;
+
+        if (isImage || isVideo) {
+          const ext = isImage ? "jpg" : "png" ? "gif" : "mp4";
+          const msgType = isImage ? "imageMessage" : "videoMessage";
+          const originalName = `broadcast_media.${ext}`;
+
+          mediaBuffer = await downloadMediaMessage(messageInfo, "buffer", {});
+          const result = await fileManager.saveFile(mediaBuffer, originalName, "images");
+          if (!result?.success || !result.path) {
+            const reason = result?.error || "Unknown error";
+            throw new Error("Gagal menyimpan file: " + reason);
+          }
+
+          mediaType = isImage ? "image" : "video";
+          await reply(
+            `📡 Mengirim ${mediaType} broadcast ke ${groupIds.length} grup...`
+          );
+        } else if (!args.length) {
+          return await reply(
+            "❌ *Usage Error*\n\nGunakan: broadcast <pesan>\natau kirim gambar/video dengan caption."
+          );
+        } else {
+          await reply(`📡 Mengirim pesan teks ke ${groupIds.length} grup...`);
+        }
+
+        let success = 0;
+        let fail = 0;
 
         for (const groupId of groupIds) {
           try {
-            const broadcastMessage = `📢 *BROADCAST MESSAGE*\n\n${message}\n\n_Pesan ini dikirim oleh Owner Bot_`;
-            await sock.sendMessage(groupId, { text: broadcastMessage });
-            successCount++;
-            
-            // Small delay to prevent spam
-            await new Promise(resolve => setTimeout(resolve, 1000));
-          } catch (error) {
-            botLogger.error(`Failed to broadcast to ${groupId}:`, error);
-            failCount++;
+            if (mediaBuffer && mediaType) {
+              await sock.sendMessage(groupId, {
+                [mediaType]: mediaBuffer,
+                caption,
+              });
+            } else {
+              await sock.sendMessage(groupId, { text: caption });
+            }
+
+            success++;
+            await new Promise((r) => setTimeout(r, 1000));
+          } catch (err) {
+            console.log(err);
+            config.apcb.error(`Gagal kirim ke ${groupId}`, err);
+            fail++;
           }
         }
 
-        const resultMessage = `✅ *Broadcast Complete*\n\n📊 *Results:*\n├ Success: ${successCount} groups\n├ Failed: ${failCount} groups\n└ Total: ${groupIds.length} groups`;
+        const resultMessage = `✅ *Broadcast Selesai*\n\n📊 *Hasil:*\n├ Berhasil: ${success} grup\n├ Gagal: ${fail} grup\n└ Total: ${groupIds.length} grup`;
         await reply(resultMessage);
-
-      } catch (error) {
-        botLogger.error("Error in broadcast command:", error);
-        await reply("❌ *Error*\n\nTerjadi kesalahan saat broadcast.");
+      } catch (err) {
+        console.log(err);
+        config.apcb.error("Error di command broadcast:", err);
+        await reply("❌ *Error:* Terjadi kesalahan saat broadcast.");
       }
     },
   });
@@ -112,39 +146,55 @@ export default function (registry) {
     exec: async ({ sock, messageInfo, reply, args }) => {
       try {
         if (!args.length) {
-          await reply("❌ *Usage Error*\n\nGunakan: join <link_undangan>\nContoh: join https://chat.whatsapp.com/xxxxx");
+          await reply(
+            "❌ *Usage Error*\n\nGunakan: join <link_undangan>\nContoh: join https://chat.whatsapp.com/xxxxx"
+          );
           return;
         }
 
         const inviteLink = args[0];
-        const inviteCodeMatch = inviteLink.match(/(?:https:\/\/chat\.whatsapp\.com\/|invite\/)([A-Za-z0-9]+)/);
-        
+        const inviteCodeMatch = inviteLink.match(
+          /(?:https:\/\/chat\.whatsapp\.com\/|invite\/)([A-Za-z0-9]+)/
+        );
+
         if (!inviteCodeMatch) {
-          await reply("❌ *Invalid Link*\n\nLink undangan tidak valid. Pastikan menggunakan format:\nhttps://chat.whatsapp.com/xxxxx");
+          await reply(
+            "❌ *Invalid Link*\n\nLink undangan tidak valid. Pastikan menggunakan format:\nhttps://chat.whatsapp.com/xxxxx"
+          );
           return;
         }
 
         const inviteCode = inviteCodeMatch[1];
-        
+
         try {
           const groupInfo = await sock.groupGetInviteInfo(inviteCode);
-          await reply(`🔍 *Group Info*\n\nNama: ${groupInfo.subject}\nDeskripsi: ${groupInfo.desc || "Tidak ada"}\nAnggota: ${groupInfo.size} orang\n\nBergabung ke grup...`);
-          
+          await reply(
+            `🔍 *Group Info*\n\nNama: ${groupInfo.subject}\nDeskripsi: ${
+              groupInfo.desc || "Tidak ada"
+            }\nAnggota: ${groupInfo.size} orang\n\nBergabung ke grup...`
+          );
+
           const result = await sock.groupAcceptInvite(inviteCode);
-          await reply(`✅ *Success*\n\nBerhasil bergabung ke grup: ${groupInfo.subject}`);
-          
+          await reply(
+            `✅ *Success*\n\nBerhasil bergabung ke grup: ${groupInfo.subject}`
+          );
         } catch (joinError) {
           if (joinError.message.includes("not-authorized")) {
-            await reply("❌ *Authorization Failed*\n\nBot tidak memiliki izin untuk bergabung ke grup ini.");
+            await reply(
+              "❌ *Authorization Failed*\n\nBot tidak memiliki izin untuk bergabung ke grup ini."
+            );
           } else if (joinError.message.includes("gone")) {
-            await reply("❌ *Link Expired*\n\nLink undangan sudah tidak berlaku.");
+            await reply(
+              "❌ *Link Expired*\n\nLink undangan sudah tidak berlaku."
+            );
           } else {
-            await reply(`❌ *Join Failed*\n\nGagal bergabung ke grup: ${joinError.message}`);
+            await reply(
+              `❌ *Join Failed*\n\nGagal bergabung ke grup: ${joinError.message}`
+            );
           }
         }
-
       } catch (error) {
-        botLogger.error("Error in join command:", error);
+        config.apcb.error("Error in join command:", error);
         await reply("❌ *Error*\n\nTerjadi kesalahan saat bergabung ke grup.");
       }
     },
@@ -154,44 +204,86 @@ export default function (registry) {
   registry.addGlobalCommand({
     name: "leave",
     aliases: ["leavegroup", "keluar"],
-    description: "Leave from current group or specified group (Owner only)",
-    usage: "leave [group_id]",
+    description:
+      "Keluar dari grup saat ini, grup lain, atau semua grup (Owner only)",
+    usage: "leave [group_id | all] [pesan]",
     category: "owner",
     isowner: true,
     exec: async ({ sock, messageInfo, reply, args }) => {
       try {
+        // Fungsi delay
+        const delay = (ms) => new Promise((res) => setTimeout(res, ms));
+
         let targetGroupId;
-        
-        if (args.length > 0) {
-          targetGroupId = args[0];
-        } else {
-          // Leave current group if command is used in group
-          if (messageInfo.isGroup) {
-            targetGroupId = messageInfo.chat;
-          } else {
-            await reply("❌ *Usage Error*\n\nGunakan di grup atau sertakan group ID:\nleave <group_id>");
+        let customLeaveMsg;
+
+        if (args[0] === "all") {
+          // Keluar dari semua grup
+          const groups = await sock.groupFetchAllParticipating();
+          const groupIds = Object.keys(groups);
+          customLeaveMsg =
+            args.slice(1).join(" ").trim() ||
+            "👋 Terima kasih telah menggunakan bot ini!";
+
+          if (groupIds.length === 0) {
+            await reply("⚠️ Bot tidak berada di grup manapun.");
             return;
           }
+
+          await reply(
+            `🚪 *Leaving All Groups*\nBot akan keluar dari ${groupIds.length} grup...`
+          );
+
+          for (const groupId of groupIds) {
+            const metadata = groups[groupId];
+            try {
+              await sock.sendMessage(groupId, { text: customLeaveMsg });
+              await delay(1500);
+              await sock.groupLeave(groupId);
+              config.apcb.info(
+                `✅ Bot left group: ${metadata.subject} (${groupId})`
+              );
+            } catch (err) {
+              config.apcb.warn(
+                `❌ Gagal keluar dari ${metadata.subject}: ${err.message}`
+              );
+            }
+          }
+
+          await reply("✅ Bot telah keluar dari semua grup.");
+          return;
         }
 
-        try {
-          const groupMetadata = await sock.groupMetadata(targetGroupId);
-          
-          await reply(`👋 *Leaving Group*\n\nBot akan keluar dari grup: ${groupMetadata.subject}\n\nTerima kasih telah menggunakan bot ini!`);
-          
-          // Small delay before leaving
-          setTimeout(async () => {
-            await sock.groupLeave(targetGroupId);
-            botLogger.info(`Bot left group: ${groupMetadata.subject} (${targetGroupId})`);
-          }, 2000);
-          
-        } catch (leaveError) {
-          await reply(`❌ *Leave Failed*\n\nGagal keluar dari grup: ${leaveError.message}`);
+        // Handle grup spesifik atau grup saat ini
+        if (args.length > 0 && args[0].endsWith("@g.us")) {
+          targetGroupId = args[0];
+          customLeaveMsg = args.slice(1).join(" ").trim();
+        } else if (messageInfo.isGroup) {
+          targetGroupId = messageInfo.chat;
+          customLeaveMsg = args.join(" ").trim();
+        } else {
+          await reply(
+            "❌ *Usage Error*\n\nGunakan di grup atau sertakan group ID:\nleave <group_id | all> <pesan>"
+          );
+          return;
         }
 
-      } catch (error) {
-        botLogger.error("Error in leave command:", error);
-        await reply("❌ *Error*\n\nTerjadi kesalahan saat keluar dari grup.");
+        if (!customLeaveMsg) {
+          customLeaveMsg =
+            "👋 Terima kasih telah menggunakan bot ini!\n Bot akan keluar otomatis karena sudah tidak di gunakan";
+        }
+
+        const metadata = await sock.groupMetadata(targetGroupId);
+        await sock.sendMessage(targetGroupId, { text: customLeaveMsg });
+        await delay(1500);
+        await sock.groupLeave(groupId);
+        config.apcb.info(
+          `✅ Bot left group: ${metadata.subject} (${targetGroupId})`
+        );
+        await reply(`✅ Bot telah keluar dari grup *${metadata.subject}*`);
+      } catch (err) {
+        config.apcb.error("❌ Error in leave command:", err);
+        await reply("❌ Terjadi kesalahan saat keluar dari grup.");
       }
     },
   });
@@ -210,26 +302,31 @@ export default function (registry) {
         const groupList = Object.values(groups);
 
         if (groupList.length === 0) {
-          await reply("📋 *GROUP LIST*\n\nBot belum tergabung dalam grup manapun.");
+          await reply(
+            "📋 *GROUP LIST*\n\nBot belum tergabung dalam grup manapun."
+          );
           return;
         }
 
         let message = `📋 *GROUP LIST (${groupList.length})*\n\n`;
-        
+
         groupList.forEach((group, index) => {
           const prefix = index === groupList.length - 1 ? "└" : "├";
           message += `${prefix} *${group.subject}*\n`;
           message += `   └ ID: ${group.id}\n`;
           message += `   └ Members: ${group.participants.length}\n`;
-          message += `   └ Admin: ${group.participants.filter(p => p.admin).length}\n\n`;
+          message += `   └ Admin: ${
+            group.participants.filter((p) => p.admin).length
+          }\n\n`;
         });
 
         message += `📊 *Total: ${groupList.length} groups*`;
         await reply(message);
-
       } catch (error) {
-        botLogger.error("Error in groups command:", error);
-        await reply("❌ *Error*\n\nTerjadi kesalahan saat mengambil daftar grup.");
+        config.apcb.error("Error in groups command:", error);
+        await reply(
+          "❌ *Error*\n\nTerjadi kesalahan saat mengambil daftar grup."
+        );
       }
     },
   });
@@ -245,34 +342,40 @@ export default function (registry) {
     exec: async ({ sock, messageInfo, reply, args }) => {
       try {
         if (!args.length) {
-          await reply("❌ *Usage Error*\n\nGunakan: eval <kode_javascript>\nContoh: eval console.log('Hello')");
+          await reply(
+            "❌ *Usage Error*\n\nGunakan: eval <kode_javascript>\nContoh: eval console.log('Hello')"
+          );
           return;
         }
 
         const code = args.join(" ");
-        
+
         try {
           // Create a safer evaluation context
           const result = eval(`(async () => { ${code} })()`);
           const output = await Promise.resolve(result);
-          
+
           let responseText = "✅ *Code Executed*\n\n";
           responseText += `*Input:*\n\`\`\`${code}\`\`\`\n\n`;
-          
+
           if (output !== undefined) {
-            responseText += `*Output:*\n\`\`\`${typeof output === 'object' ? JSON.stringify(output, null, 2) : String(output)}\`\`\``;
+            responseText += `*Output:*\n\`\`\`${
+              typeof output === "object"
+                ? JSON.stringify(output, null, 2)
+                : String(output)
+            }\`\`\``;
           } else {
             responseText += "*Output:* undefined";
           }
-          
-          await reply(responseText);
-          
-        } catch (evalError) {
-          await reply(`❌ *Execution Error*\n\n*Input:*\n\`\`\`${code}\`\`\`\n\n*Error:*\n\`\`\`${evalError.message}\`\`\``);
-        }
 
+          await reply(responseText);
+        } catch (evalError) {
+          await reply(
+            `❌ *Execution Error*\n\n*Input:*\n\`\`\`${code}\`\`\`\n\n*Error:*\n\`\`\`${evalError.message}\`\`\``
+          );
+        }
       } catch (error) {
-        botLogger.error("Error in eval command:", error);
+        config.apcb.error("Error in eval command:", error);
         await reply("❌ *Error*\n\nTerjadi kesalahan saat menjalankan kode.");
       }
     },
@@ -289,18 +392,32 @@ export default function (registry) {
     exec: async ({ sock, messageInfo, reply, args }) => {
       try {
         if (!args.length) {
-          await reply("❌ *Usage Error*\n\nGunakan: exec <command>\nContoh: exec ls -la");
+          await reply(
+            "❌ *Usage Error*\n\nGunakan: exec <command>\nContoh: exec ls -la"
+          );
           return;
         }
 
         const command = args.join(" ");
-        
+
         // Security check - block dangerous commands
-        const dangerousCommands = ['rm', 'del', 'format', 'fdisk', 'mkfs', 'dd', 'shutdown', 'reboot', 'halt'];
+        const dangerousCommands = [
+          "rm",
+          "del",
+          "format",
+          "fdisk",
+          "mkfs",
+          "dd",
+          "shutdown",
+          "reboot",
+          "halt",
+        ];
         const commandLower = command.toLowerCase();
-        
-        if (dangerousCommands.some(cmd => commandLower.includes(cmd))) {
-          await reply("❌ *Dangerous Command*\n\nCommand yang berpotensi berbahaya tidak diizinkan.");
+
+        if (dangerousCommands.some((cmd) => commandLower.includes(cmd))) {
+          await reply(
+            "❌ *Dangerous Command*\n\nCommand yang berpotensi berbahaya tidak diizinkan."
+          );
           return;
         }
 
@@ -308,26 +425,32 @@ export default function (registry) {
           const { exec } = await import("child_process");
           const { promisify } = await import("util");
           const execAsync = promisify(exec);
-          
-          await reply(`⚡ *Executing Command*\n\n\`\`\`${command}\`\`\`\n\nPlease wait...`);
-          
-          const { stdout, stderr } = await execAsync(command, { timeout: 30000 });
-          
+
+          await reply(
+            `⚡ *Executing Command*\n\n\`\`\`${command}\`\`\`\n\nPlease wait...`
+          );
+
+          const { stdout, stderr } = await execAsync(command, {
+            timeout: 30000,
+          });
+
           let output = "";
           if (stdout) output += `*Output:*\n\`\`\`${stdout}\`\`\`\n\n`;
           if (stderr) output += `*Error:*\n\`\`\`${stderr}\`\`\``;
-          
-          if (!output) output = "*No output generated*";
-          
-          await reply(`✅ *Command Executed*\n\n${output}`);
-          
-        } catch (execError) {
-          await reply(`❌ *Execution Failed*\n\n*Command:*\n\`\`\`${command}\`\`\`\n\n*Error:*\n\`\`\`${execError.message}\`\`\``);
-        }
 
+          if (!output) output = "*No output generated*";
+
+          await reply(`✅ *Command Executed*\n\n${output}`);
+        } catch (execError) {
+          await reply(
+            `❌ *Execution Failed*\n\n*Command:*\n\`\`\`${command}\`\`\`\n\n*Error:*\n\`\`\`${execError.message}\`\`\``
+          );
+        }
       } catch (error) {
-        botLogger.error("Error in exec command:", error);
-        await reply("❌ *Error*\n\nTerjadi kesalahan saat menjalankan command.");
+        config.apcb.error("Error in exec command:", error);
+        await reply(
+          "❌ *Error*\n\nTerjadi kesalahan saat menjalankan command."
+        );
       }
     },
   });
@@ -343,21 +466,25 @@ export default function (registry) {
     exec: async ({ sock, messageInfo, reply, args }) => {
       try {
         let targetPhone = "";
-        
+
         if (messageInfo.mentionedJid && messageInfo.mentionedJid.length > 0) {
           targetPhone = messageInfo.mentionedJid[0].split("@")[0];
         } else if (args.length > 0) {
           targetPhone = args[0].replace(/[^0-9]/g, "");
         } else {
-          await reply("❌ *Usage Error*\n\nGunakan: block <@user> atau block <nomor>\nContoh: block @user atau block 628123456789");
+          await reply(
+            "❌ *Usage Error*\n\nGunakan: block <@user> atau block <nomor>\nContoh: block @user atau block 628123456789"
+          );
           return;
         }
 
         // Get current blocked users
         const blockedUsers = await config.ownerDB.get("blockedUsers", []);
-        
+
         if (blockedUsers.includes(targetPhone)) {
-          await reply(`⚠️ *Already Blocked*\n\nUser +${targetPhone} sudah diblokir.`);
+          await reply(
+            `⚠️ *Already Blocked*\n\nUser +${targetPhone} sudah diblokir.`
+          );
           return;
         }
 
@@ -365,11 +492,12 @@ export default function (registry) {
         blockedUsers.push(targetPhone);
         await config.ownerDB.set("blockedUsers", blockedUsers);
 
-        await reply(`✅ *User Blocked*\n\nUser +${targetPhone} berhasil diblokir dari menggunakan bot.`);
-        botLogger.info(`User blocked: ${targetPhone}`);
-
+        await reply(
+          `✅ *User Blocked*\n\nUser +${targetPhone} berhasil diblokir dari menggunakan bot.`
+        );
+        config.apcb.info(`User blocked: ${targetPhone}`);
       } catch (error) {
-        botLogger.error("Error in block command:", error);
+        config.apcb.error("Error in block command:", error);
         await reply("❌ *Error*\n\nTerjadi kesalahan saat memblokir user.");
       }
     },
@@ -386,34 +514,43 @@ export default function (registry) {
     exec: async ({ sock, messageInfo, reply, args }) => {
       try {
         let targetPhone = "";
-        
+
         if (messageInfo.mentionedJid && messageInfo.mentionedJid.length > 0) {
           targetPhone = messageInfo.mentionedJid[0].split("@")[0];
         } else if (args.length > 0) {
           targetPhone = args[0].replace(/[^0-9]/g, "");
         } else {
-          await reply("❌ *Usage Error*\n\nGunakan: unblock <@user> atau unblock <nomor>\nContoh: unblock @user atau unblock 628123456789");
+          await reply(
+            "❌ *Usage Error*\n\nGunakan: unblock <@user> atau unblock <nomor>\nContoh: unblock @user atau unblock 628123456789"
+          );
           return;
         }
 
         // Get current blocked users
         const blockedUsers = await config.ownerDB.get("blockedUsers", []);
-        
+
         if (!blockedUsers.includes(targetPhone)) {
-          await reply(`⚠️ *Not Blocked*\n\nUser +${targetPhone} tidak dalam daftar blokir.`);
+          await reply(
+            `⚠️ *Not Blocked*\n\nUser +${targetPhone} tidak dalam daftar blokir.`
+          );
           return;
         }
 
         // Remove from blocked list
-        const updatedBlockedUsers = blockedUsers.filter(user => user !== targetPhone);
+        const updatedBlockedUsers = blockedUsers.filter(
+          (user) => user !== targetPhone
+        );
         await config.ownerDB.set("blockedUsers", updatedBlockedUsers);
 
-        await reply(`✅ *User Unblocked*\n\nUser +${targetPhone} berhasil dihapus dari daftar blokir.`);
-        botLogger.info(`User unblocked: ${targetPhone}`);
-
+        await reply(
+          `✅ *User Unblocked*\n\nUser +${targetPhone} berhasil dihapus dari daftar blokir.`
+        );
+        config.apcb.info(`User unblocked: ${targetPhone}`);
       } catch (error) {
-        botLogger.error("Error in unblock command:", error);
-        await reply("❌ *Error*\n\nTerjadi kesalahan saat menghapus blokir user.");
+        config.apcb.error("Error in unblock command:", error);
+        await reply(
+          "❌ *Error*\n\nTerjadi kesalahan saat menghapus blokir user."
+        );
       }
     },
   });
@@ -436,7 +573,7 @@ export default function (registry) {
         }
 
         let message = `🚫 *BLOCKED USERS (${blockedUsers.length})*\n\n`;
-        
+
         blockedUsers.forEach((phone, index) => {
           const prefix = index === blockedUsers.length - 1 ? "└" : "├";
           message += `${prefix} +${phone}\n`;
@@ -444,10 +581,11 @@ export default function (registry) {
 
         message += `\n📊 *Total: ${blockedUsers.length} blocked users*`;
         await reply(message);
-
       } catch (error) {
-        botLogger.error("Error in blocklist command:", error);
-        await reply("❌ *Error*\n\nTerjadi kesalahan saat mengambil daftar user yang diblokir.");
+        config.apcb.error("Error in blocklist command:", error);
+        await reply(
+          "❌ *Error*\n\nTerjadi kesalahan saat mengambil daftar user yang diblokir."
+        );
       }
     },
   });
@@ -463,22 +601,26 @@ export default function (registry) {
     exec: async ({ sock, messageInfo, reply, args }) => {
       try {
         if (!args.length) {
-          await reply("❌ *Usage Error*\n\nGunakan: setstatus <teks_status>\nContoh: setstatus Bot WhatsApp aktif 24/7");
+          await reply(
+            "❌ *Usage Error*\n\nGunakan: setstatus <teks_status>\nContoh: setstatus Bot WhatsApp aktif 24/7"
+          );
           return;
         }
 
         const statusText = args.join(" ");
-        
+
         try {
           await sock.updateProfileStatus(statusText);
-          await reply(`✅ *Status Updated*\n\nStatus WhatsApp bot berhasil diubah ke:\n"${statusText}"`);
-          
+          await reply(
+            `✅ *Status Updated*\n\nStatus WhatsApp bot berhasil diubah ke:\n"${statusText}"`
+          );
         } catch (statusError) {
-          await reply(`❌ *Update Failed*\n\nGagal mengubah status: ${statusError.message}`);
+          await reply(
+            `❌ *Update Failed*\n\nGagal mengubah status: ${statusError.message}`
+          );
         }
-
       } catch (error) {
-        botLogger.error("Error in setstatus command:", error);
+        config.apcb.error("Error in setstatus command:", error);
         await reply("❌ *Error*\n\nTerjadi kesalahan saat mengubah status.");
       }
     },
@@ -495,30 +637,35 @@ export default function (registry) {
     exec: async ({ sock, messageInfo, reply, args }) => {
       try {
         const currentMode = await config.ownerDB.get("maintenanceMode", false);
-        
+
         if (!args.length) {
           const status = currentMode ? "ON" : "OFF";
-          await reply(`🔧 *Maintenance Mode*\n\nStatus saat ini: ${status}\n\nGunakan: maintenance on/off`);
+          await reply(
+            `🔧 *Maintenance Mode*\n\nStatus saat ini: ${status}\n\nGunakan: maintenance on/off`
+          );
           return;
         }
 
         const action = args[0].toLowerCase();
-        
+
         if (action === "on" || action === "aktif") {
           await config.ownerDB.set("maintenanceMode", true);
-          await reply("🔧 *Maintenance Mode: ON*\n\nBot sekarang dalam mode maintenance.\nHanya owner yang dapat menggunakan command.");
-          
+          await reply(
+            "🔧 *Maintenance Mode: ON*\n\nBot sekarang dalam mode maintenance.\nHanya owner yang dapat menggunakan command."
+          );
         } else if (action === "off" || action === "nonaktif") {
           await config.ownerDB.set("maintenanceMode", false);
-          await reply("✅ *Maintenance Mode: OFF*\n\nBot kembali normal.\nSemua user dapat menggunakan command.");
-          
+          await reply(
+            "✅ *Maintenance Mode: OFF*\n\nBot kembali normal.\nSemua user dapat menggunakan command."
+          );
         } else {
           await reply("❌ *Invalid Option*\n\nGunakan: maintenance on/off");
         }
-
       } catch (error) {
-        botLogger.error("Error in maintenance command:", error);
-        await reply("❌ *Error*\n\nTerjadi kesalahan saat mengubah mode maintenance.");
+        config.apcb.error("Error in maintenance command:", error);
+        await reply(
+          "❌ *Error*\n\nTerjadi kesalahan saat mengubah mode maintenance."
+        );
       }
     },
   });
@@ -536,7 +683,7 @@ export default function (registry) {
         const os = await import("os");
         const uptime = process.uptime();
         const systemUptime = os.uptime();
-        
+
         const formatUptime = (seconds) => {
           const days = Math.floor(seconds / 86400);
           const hours = Math.floor((seconds % 86400) / 3600);
@@ -549,7 +696,7 @@ export default function (registry) {
         const systemMemory = {
           total: os.totalmem(),
           free: os.freemem(),
-          used: os.totalmem() - os.freemem()
+          used: os.totalmem() - os.freemem(),
         };
 
         const sysInfo = `🖥️ *SYSTEM INFORMATION*
@@ -582,23 +729,27 @@ export default function (registry) {
 ├ Cores: ${os.cpus().length}
 ├ Model: ${os.cpus()[0].model}
 ├ Speed: ${os.cpus()[0].speed}MHz
-└ Load Average: ${os.loadavg().map(l => l.toFixed(2)).join(", ")}
+└ Load Average: ${os
+          .loadavg()
+          .map((l) => l.toFixed(2))
+          .join(", ")}
 
 ⏱️ *Uptime:*
 ├ Process: ${formatUptime(uptime)}
 └ System: ${formatUptime(systemUptime)}`;
 
         await reply(sysInfo);
-
       } catch (error) {
-        botLogger.error("Error in sysinfo command:", error);
-        await reply("❌ *Error*\n\nTerjadi kesalahan saat mengambil informasi sistem.");
+        config.apcb.error("Error in sysinfo command:", error);
+        await reply(
+          "❌ *Error*\n\nTerjadi kesalahan saat mengambil informasi sistem."
+        );
       }
     },
   });
 
   // ==================== ORIGINAL COMMANDS ====================
-  
+
   registry.addGlobalCommand({
     name: "start",
     aliases: ["mulai"],
@@ -677,7 +828,7 @@ export default function (registry) {
 
         await reply(logData);
       } catch (error) {
-        botLogger.error("Error in logs command:", error);
+        config.apcb.error("Error in logs command:", error);
         await reply("❌ *Error*\n\nTerjadi kesalahan saat mengambil logs.");
       }
     },
@@ -700,7 +851,10 @@ export default function (registry) {
         const memoryUsage = process.memoryUsage();
         const stats = registry.getCommandStats();
         const totalCommands = Object.keys(stats).length;
-        const totalExecutions = Object.values(stats).reduce((sum, stat) => sum + stat.executions, 0);
+        const totalExecutions = Object.values(stats).reduce(
+          (sum, stat) => sum + stat.executions,
+          0
+        );
 
         const statusMessage = `📊 *BOT STATUS & STATISTICS*
 
@@ -728,7 +882,7 @@ export default function (registry) {
 
         await reply(statusMessage);
       } catch (error) {
-        botLogger.error("Error in status command:", error);
+        config.apcb.error("Error in status command:", error);
         await reply("❌ *Error*\n\nTerjadi kesalahan saat mengambil status.");
       }
     },
@@ -746,7 +900,6 @@ export default function (registry) {
       try {
         let clearedItems = [];
 
-
         if (global.gc) {
           global.gc();
           clearedItems.push("Memory garbage collected");
@@ -762,7 +915,7 @@ export default function (registry) {
         await reply(resultMessage);
       } catch (error) {
         console.log(error);
-        botLogger.error("Error in clearcache command:", error);
+        config.apcb.error("Error in clearcache command:", error);
         await reply("❌ *Error*\n\nTerjadi kesalahan saat membersihkan cache.");
       }
     },
@@ -793,7 +946,8 @@ export default function (registry) {
             updateMessage += "✅ Bot sudah menggunakan versi terbaru.";
           } else {
             updateMessage += `✅ Update berhasil!\n\n*Changes:*\n\`\`\`${stdout}\`\`\``;
-            updateMessage += "\n\n💡 *Tip:* Gunakan 'restart' untuk menerapkan update.";
+            updateMessage +=
+              "\n\n💡 *Tip:* Gunakan 'restart' untuk menerapkan update.";
           }
 
           if (stderr) {
@@ -807,7 +961,7 @@ export default function (registry) {
           );
         }
       } catch (error) {
-        botLogger.error("Error in update command:", error);
+        config.apcb.error("Error in update command:", error);
         await reply("❌ *Error*\n\nTerjadi kesalahan saat melakukan update.");
       }
     },
@@ -823,7 +977,9 @@ export default function (registry) {
     isowner: true,
     exec: async ({ sock, messageInfo, reply }) => {
       try {
-        await reply("💾 *Creating Backup*\n\nMembuat backup konfigurasi bot...");
+        await reply(
+          "💾 *Creating Backup*\n\nMembuat backup konfigurasi bot..."
+        );
 
         try {
           const backupPath = await config.ownerDB.createBackup();
@@ -845,7 +1001,7 @@ export default function (registry) {
           await reply(`❌ *Backup Failed*\n\nError: ${backupError.message}`);
         }
       } catch (error) {
-        botLogger.error("Error in backup command:", error);
+        config.apcb.error("Error in backup command:", error);
         await reply("❌ *Error*\n\nTerjadi kesalahan saat membuat backup.");
       }
     },
@@ -897,8 +1053,10 @@ export default function (registry) {
 
         await reply(speedTestResult);
       } catch (error) {
-        botLogger.error("Error in speedtest command:", error);
-        await reply("❌ *Error*\n\nTerjadi kesalahan saat melakukan speed test.");
+        config.apcb.error("Error in speedtest command:", error);
+        await reply(
+          "❌ *Error*\n\nTerjadi kesalahan saat melakukan speed test."
+        );
       }
     },
   });
@@ -921,17 +1079,23 @@ export default function (registry) {
           const moduleName = args[0];
           try {
             const moduleKeys = Object.keys(require.cache || {});
-            const targetModule = moduleKeys.find(key => key.includes(moduleName));
-            
+            const targetModule = moduleKeys.find((key) =>
+              key.includes(moduleName)
+            );
+
             if (targetModule) {
               delete require.cache[targetModule];
               reloadedModules.push(moduleName);
             } else {
-              await reply(`❌ *Module Not Found*\n\nModul '${moduleName}' tidak ditemukan.`);
+              await reply(
+                `❌ *Module Not Found*\n\nModul '${moduleName}' tidak ditemukan.`
+              );
               return;
             }
           } catch (moduleError) {
-            await reply(`❌ *Module Error*\n\nError loading '${moduleName}': ${moduleError.message}`);
+            await reply(
+              `❌ *Module Error*\n\nError loading '${moduleName}': ${moduleError.message}`
+            );
             return;
           }
         } else {
@@ -958,7 +1122,7 @@ export default function (registry) {
 
         await reply(reloadMessage);
       } catch (error) {
-        botLogger.error("Error in reload command:", error);
+        config.apcb.error("Error in reload command:", error);
         await reply("❌ *Error*\n\nTerjadi kesalahan saat melakukan reload.");
       }
     },
@@ -981,19 +1145,25 @@ export default function (registry) {
         const superOwner = await config.ownerDB.get("superOwner", "");
 
         if (superOwner && senderPhone !== superOwner) {
-          await reply("❌ *Permission Denied*\n\nHanya Super Owner yang dapat menambah owner baru.");
+          await reply(
+            "❌ *Permission Denied*\n\nHanya Super Owner yang dapat menambah owner baru."
+          );
           return;
         }
 
         if (!args.length) {
-          await reply("❌ *Usage Error*\n\nGunakan: addowner <nomor_telepon>\nContoh: addowner 628123456789");
+          await reply(
+            "❌ *Usage Error*\n\nGunakan: addowner <nomor_telepon>\nContoh: addowner 628123456789"
+          );
           return;
         }
 
         const phoneNumber = args[0].replace(/[^0-9]/g, "");
 
         if (currentOwners.includes(phoneNumber)) {
-          await reply(`⚠️ *Already Owner*\n\nNomor ${phoneNumber} sudah menjadi owner.`);
+          await reply(
+            `⚠️ *Already Owner*\n\nNomor ${phoneNumber} sudah menjadi owner.`
+          );
           return;
         }
 
@@ -1001,9 +1171,11 @@ export default function (registry) {
         await config.ownerDB.set("owners", currentOwners);
         registry.setOwners(currentOwners);
 
-        await reply(`✅ *Owner Added*\n\nNomor ${phoneNumber} berhasil ditambahkan sebagai owner.`);
+        await reply(
+          `✅ *Owner Added*\n\nNomor ${phoneNumber} berhasil ditambahkan sebagai owner.`
+        );
       } catch (error) {
-        botLogger.error("Error in addowner command:", error);
+        config.apcb.error("Error in addowner command:", error);
         await reply("❌ *Error*\n\nTerjadi kesalahan saat menambah owner.");
       }
     },
@@ -1025,12 +1197,16 @@ export default function (registry) {
         const superOwner = await config.ownerDB.get("superOwner", "");
 
         if (superOwner && senderPhone !== superOwner) {
-          await reply("❌ *Permission Denied*\n\nHanya Super Owner yang dapat menghapus owner.");
+          await reply(
+            "❌ *Permission Denied*\n\nHanya Super Owner yang dapat menghapus owner."
+          );
           return;
         }
 
         if (!args.length) {
-          await reply("❌ *Usage Error*\n\nGunakan: delowner <nomor_telepon>\nContoh: delowner 628123456789");
+          await reply(
+            "❌ *Usage Error*\n\nGunakan: delowner <nomor_telepon>\nContoh: delowner 628123456789"
+          );
           return;
         }
 
@@ -1046,13 +1222,17 @@ export default function (registry) {
           return;
         }
 
-        const updatedOwners = currentOwners.filter(owner => owner !== phoneNumber);
+        const updatedOwners = currentOwners.filter(
+          (owner) => owner !== phoneNumber
+        );
         await config.ownerDB.set("owners", updatedOwners);
         registry.setOwners(updatedOwners);
 
-        await reply(`✅ *Owner Removed*\n\nNomor ${phoneNumber} berhasil dihapus dari daftar owner.`);
+        await reply(
+          `✅ *Owner Removed*\n\nNomor ${phoneNumber} berhasil dihapus dari daftar owner.`
+        );
       } catch (error) {
-        botLogger.error("Error in delowner command:", error);
+        config.apcb.error("Error in delowner command:", error);
         await reply("❌ *Error*\n\nTerjadi kesalahan saat menghapus owner.");
       }
     },
@@ -1090,8 +1270,10 @@ export default function (registry) {
         ownerList += `\n📊 *Total:* ${owners.length} owner(s)`;
         await reply(ownerList);
       } catch (error) {
-        botLogger.error("Error in listowner command:", error);
-        await reply("❌ *Error*\n\nTerjadi kesalahan saat mengambil daftar owner.");
+        config.apcb.error("Error in listowner command:", error);
+        await reply(
+          "❌ *Error*\n\nTerjadi kesalahan saat mengambil daftar owner."
+        );
       }
     },
   });
@@ -1112,7 +1294,9 @@ export default function (registry) {
         const superOwner = await config.ownerDB.get("superOwner", "");
 
         if (owners.length > 0 || superOwner) {
-          await reply("❌ *Claim Denied*\n\nSudah ada owner yang terdaftar.\nHubungi owner untuk mendapatkan akses.");
+          await reply(
+            "❌ *Claim Denied*\n\nSudah ada owner yang terdaftar.\nHubungi owner untuk mendapatkan akses."
+          );
           return;
         }
 
@@ -1120,14 +1304,18 @@ export default function (registry) {
         await config.ownerDB.set("owners", [senderPhone]);
         registry.setOwners([senderPhone]);
 
-        await reply(`🎉 *Ownership Claimed*\n\nSelamat! Anda sekarang adalah Super Owner bot.\nNomor: +${senderPhone}\n\nGunakan perintah owner lainnya untuk mengelola bot.`);
-        botLogger.info(`Emergency ownership claimed by: ${senderPhone}`);
+        await reply(
+          `🎉 *Ownership Claimed*\n\nSelamat! Anda sekarang adalah Super Owner bot.\nNomor: +${senderPhone}\n\nGunakan perintah owner lainnya untuk mengelola bot.`
+        );
+        config.apcb.info(`Emergency ownership claimed by: ${senderPhone}`);
       } catch (error) {
-        botLogger.error("Error in claimowner command:", error);
-        await reply("❌ *Error*\n\nTerjadi kesalahan saat mengklaim ownership.");
+        config.apcb.error("Error in claimowner command:", error);
+        await reply(
+          "❌ *Error*\n\nTerjadi kesalahan saat mengklaim ownership."
+        );
       }
     },
   });
 
-  botLogger.info("✅ Enhanced Owner Commands Loaded Successfully");
+  config.apcb.info("✅ Enhanced Owner Commands Loaded Successfully");
 }

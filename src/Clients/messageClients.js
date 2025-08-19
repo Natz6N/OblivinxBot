@@ -1,15 +1,19 @@
-import { isJidNewsletter, downloadMediaMessage } from "naruyaizumi";
+import {
+  isJidNewsletter,
+  downloadMediaMessage,
+  jidNormalizedUser,
+} from "@whiskeysockets/baileys";
 import { readdirSync } from "fs";
 import path, { join, dirname } from "path";
 import { fileURLToPath } from "url";
 import fs from "fs/promises";
 import config from "../config.js";
 import fileManager from "../FileManagers/FileManager.js";
-import { botLogger } from "../bot.js";
 // Get current directory for ES modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-
+import pkg from "@whiskeysockets/baileys";
+const { proto, generateWAMessage, areJidsSameUser } = pkg;
 // Utility functions
 export const delay = (ms) => new Promise((res) => setTimeout(res, ms));
 
@@ -32,6 +36,7 @@ const MESSAGE_TYPES = {
   TEMPLATE_BUTTON_REPLY: "templateButtonReplyMessage",
   POLL_UPDATE: "pollUpdateMessage",
   MESSAGE_CONTEXT_INFO: "messageContextInfo",
+  INTERACTIVE_RESPONSE: "interactiveResponseMessage",
 };
 const BOT_INFO_PATH = path.join("./src/Data/BotInfo.json");
 
@@ -59,6 +64,7 @@ const BUTTON_RESPONSE_TYPES = [
   MESSAGE_TYPES.TEMPLATE_BUTTON_REPLY,
   MESSAGE_TYPES.LIST_RESPONSE,
   MESSAGE_TYPES.POLL_UPDATE,
+  MESSAGE_TYPES.INTERACTIVE_RESPONSE,
 ];
 
 const TEXT_MESSAGE_TYPES = [MESSAGE_TYPES.TEXT, MESSAGE_TYPES.EXTENDED_TEXT];
@@ -117,6 +123,42 @@ async function handleMessage(sock, sender, messageContent, registry) {
   }
 }
 
+async function appendTextMessage(sock, chatUpdate, msg, text) {
+  try {
+    const messages = await generateWAMessage(
+      msg.key.remoteJid,
+      { 
+        text, 
+        mentions: msg.message?.extendedTextMessage?.contextInfo?.mentionedJid || [] 
+      },
+      { 
+        userJid: sock.user.id, 
+        quoted: msg.quoted?.fakeObj 
+      }
+    );
+
+    messages.key.fromMe = areJidsSameUser(
+      msg.key.participant || msg.key.remoteJid, 
+      sock.user.id
+    );
+    messages.key.id = msg.key.id;
+    messages.pushName = msg.pushName;
+    if (msg.key.participant) messages.participant = msg.key.participant;
+
+    const upsert = {
+      ...chatUpdate,
+      messages: [proto.WebMessageInfo.fromObject(messages)],
+      type: "append",
+    };
+
+    sock.ev.emit("messages.upsert", upsert);
+    return text;
+  } catch (error) {
+    console.error("Error in appendTextMessage:", error);
+    return text;
+  }
+}
+
 /**
  * Enhanced function to extract button response data
  * @param {Object} message - Baileys message object
@@ -136,7 +178,7 @@ function extractButtonResponse(message) {
 
   switch (messageType) {
     case MESSAGE_TYPES.BUTTONS_RESPONSE:
-      // Handle different possible structures for buttonsResponseMessage
+      // Handle HydratedTemplate button responses
       buttonId =
         messageData.selectedButtonId ||
         messageData.selectedButton?.buttonId ||
@@ -152,19 +194,19 @@ function extractButtonResponse(message) {
         messageData.button?.displayText ||
         messageData.displayText ||
         messageData.text ||
-        "";
+        buttonId; // Use buttonId as fallback for displayText
       responseType = "button";
       break;
 
     case MESSAGE_TYPES.TEMPLATE_BUTTON_REPLY:
       buttonId = messageData.selectedId || "";
-      displayText = messageData.selectedDisplayText || "";
+      displayText = messageData.selectedDisplayText || messageData.selectedId || "";
       responseType = "template_button";
       break;
 
     case MESSAGE_TYPES.LIST_RESPONSE:
       buttonId = messageData.singleSelectReply?.selectedRowId || "";
-      displayText = messageData.singleSelectReply?.title || "";
+      displayText = messageData.singleSelectReply?.title || messageData.singleSelectReply?.selectedRowId || "";
       responseType = "list";
       break;
 
@@ -175,6 +217,21 @@ function extractButtonResponse(message) {
         buttonId = pollUpdates[0].pollUpdateMessageKey?.id || "";
         displayText = "Poll Response";
         responseType = "poll";
+      }
+      break;
+
+    case MESSAGE_TYPES.INTERACTIVE_RESPONSE:
+      try {
+        const params = JSON.parse(
+          messageData.nativeFlowResponseMessage?.paramsJson || "{}"
+        );
+        buttonId = params.id || "";
+        displayText = params.title || params.display_text || params.id || "";
+        responseType = "interactive";
+      } catch (e) {
+        console.warn("Failed to parse interactive response:", e);
+        buttonId = "";
+        displayText = "";
       }
       break;
 
@@ -321,9 +378,10 @@ async function extractMessageContent(msg) {
         ) || messageTypes[0];
     }
 
-    // Extract text content
+    // Extract text content with enhanced button handling
     let text = "";
     if (isButtonResponse && buttonData?.buttonId) {
+      // For button responses, prioritize buttonId over regular text extraction
       text = buttonData.buttonId;
     } else {
       text = extractTextContent(message).trim();
@@ -331,11 +389,7 @@ async function extractMessageContent(msg) {
 
     const hasMedia = MEDIA_TYPES.includes(primaryType);
 
-    // Consider message valid if:
-    // 1. Has text content
-    // 2. Has media content
-    // 3. Is a button response with buttonId
-    // 4. Is NOT just messageContextInfo
+    // Enhanced validity check
     const isValid =
       text.length > 0 ||
       hasMedia ||
@@ -353,7 +407,7 @@ async function extractMessageContent(msg) {
       isMixedMessage,
       isOnlyContextInfo,
       messageData: message[primaryType] || {},
-      allMessageTypes: messageTypes,
+      allMessageTypes: message,
     };
   } catch (error) {
     console.error("Error extracting message content:", error);
@@ -491,6 +545,7 @@ async function loadCommands(registry, botLogger) {
             botLogger.warn(`⚠️ Invalid command file structure: ${file}`);
           }
         } catch (fileError) {
+          console.log(fileError);
           botLogger.error(`❌ Error loading command file ${file}:`, fileError);
         }
       }
@@ -613,6 +668,7 @@ export async function handleIncomingMessage(
     if (!msg || !msg.message || msg.key.fromMe) return;
 
     const sender = msg.key.remoteJid;
+    sock.presenceSubscribe(sender);
     if (!sender) {
       botLogger.warn("Message ignored: invalid sender");
       return;
@@ -637,32 +693,41 @@ export async function handleIncomingMessage(
       return;
     }
 
+    // Enhanced button response handling
+    if (messageContent.isButtonResponse && messageContent.buttonData?.buttonId) {
+      // For button responses, prioritize buttonId as the command text
+      messageContent.text = messageContent.buttonData.buttonId;
+      
+      // Enhanced logging for button responses
+      botLogger.info(`🔘 [BUTTON] from ${sender}: ${messageContent.buttonData.buttonId} (${messageContent.buttonData.type})`);
+      
+      // If buttonId looks like a command, ensure it's processed as such
+      if (messageContent.text.startsWith(registry.prefix)) {
+        // Transform button response to text message for proper command processing
+        await appendTextMessage(
+          sock, 
+          { messages: [msg], type: "notify" }, 
+          msg, 
+          messageContent.text
+        );
+        return; // Let the transformed message be processed through normal flow
+      }
+    }
+
     // Enhanced logging for different message types
     let logPrefix;
     let logText;
 
-    if (messageContent.isButtonResponse) {
-      const buttonType =
-        messageContent.buttonData?.type?.toUpperCase() || "BUTTON";
-      logPrefix = messageContent.isMixedMessage
-        ? `🔄 [MIXED+${buttonType}]`
-        : `🔘 [${buttonType}]`;
-
-      const buttonId = messageContent.buttonData?.buttonId || "N/A";
-      const displayText = messageContent.buttonData?.displayText || "N/A";
-      logText = `ButtonID: "${buttonId}" | Display: "${displayText}"`;
-
-      // Log if this will trigger a command
-      if (buttonId.startsWith(registry.prefix)) {
-        botLogger.info(`🚀 Button will execute command: ${buttonId}`);
-      }
-    } else if (messageContent.hasMedia) {
+    if (messageContent.hasMedia) {
       logPrefix = "📎 [MEDIA]";
       logText = `${messageContent.type} ${
         messageContent.text
           ? `with caption: "${messageContent.text.substring(0, 50)}..."`
           : "(no caption)"
       }`;
+    } else if (messageContent.isButtonResponse) {
+      logPrefix = "🔘 [BUTTON]";
+      logText = `${messageContent.buttonData?.type || "unknown"}: ${messageContent.buttonData?.buttonId || "no-id"} | ${messageContent.buttonData?.displayText || "no-text"}`;
     } else if (
       messageContent.isContextInfo &&
       !messageContent.isOnlyContextInfo
@@ -697,7 +762,8 @@ export async function handleIncomingMessage(
 
     // Create comprehensive message info object
     const messageInfo = {
-      sender,
+      chat: msg.key.remoteJid, // JID tujuan chat sebenarnya
+      sender, // ini sudah remoteJid (biar backward compat)
       participant: participantId,
       text: messageContent.text,
       message: msg.message,
@@ -727,15 +793,11 @@ export async function handleIncomingMessage(
       messageContent.text?.startsWith(registry.prefix) ||
       (messageContent.isButtonResponse &&
         messageContent.buttonData?.buttonId?.startsWith(registry.prefix));
-    // penghentian command
-    
-    const owners = msg.key.participant || sender;
-    const stopped = await handleMessage(
-      sock,
-      owners,
-      messageContent,
-      registry
-    );
+
+    // Check bot status and handle accordingly
+    const whoIs = msg.key.participant || sender;
+    const owners = config.NormalizeJid(whoIs);
+    const stopped = await handleMessage(sock, owners, messageContent, registry);
     if (stopped) return;
 
     if (isCommand || messageContent.isButtonResponse) {
@@ -748,6 +810,7 @@ export async function handleIncomingMessage(
       priority: priority,
     });
   } catch (error) {
+    botLogger.error(`Error in handleIncomingMessage: ${error.message}`);
     console.log(error);
   }
 }

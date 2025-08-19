@@ -1,11 +1,9 @@
-import { downloadMediaMessage } from "naruyaizumi";
-import { botLogger } from "../bot.js";
+import { downloadMediaMessage } from "@whiskeysockets/baileys";
 import config from "../config.js";
 import FormData from "form-data";
 import fetch from "node-fetch";
 import path from "path";
 import fs from "fs";
-
 import { YtDlp } from "../libs/ytdl-wrap.js";
 import { createHash } from "crypto";
 import fileManager from "../FileManagers/FileManager.js";
@@ -112,7 +110,7 @@ export default function (registry) {
           mediaMsg,
           "buffer",
           {},
-          { logger: botLogger }
+          { logger: config.apcb }
         );
 
         if (!buffer) return reply("❌ Gagal mendownload gambar.");
@@ -224,7 +222,7 @@ export default function (registry) {
           mediaMsg,
           "buffer",
           {},
-          { logger: botLogger }
+          { logger: config.apcb }
         );
 
         if (!buffer || !Buffer.isBuffer(buffer)) {
@@ -270,7 +268,7 @@ export default function (registry) {
           { quoted: messageInfo.raw }
         );
       } catch (error) {
-        botLogger.error("Error membuat sticker:", error);
+        config.apcb.error("Error membuat sticker:", error);
         console.log(error);
         await reply("❌ Gagal membuat sticker: " + error.message);
       }
@@ -551,7 +549,7 @@ export default function (registry) {
         console.error("Error message:", error.message);
         console.error("Error stack:", error.stack);
 
-        botLogger.error("❌ Error di command ytv:", error);
+        config.apcb.error("❌ Error di command ytv:", error);
 
         // Enhanced error message
         let errorMessage = "❌ Terjadi kesalahan saat download video.";
@@ -816,5 +814,5 @@ ${description?.slice(0, 300) || "Tidak ada deskripsi..."}`;
     },
   });
 
-  botLogger.info("✅ Example commands loaded successfully");
+  config.apcb.info("✅ Example commands loaded successfully");
 }
